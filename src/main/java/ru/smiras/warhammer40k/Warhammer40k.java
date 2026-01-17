@@ -8,7 +8,6 @@ public class Warhammer40k {
         AdeptusCustodes troyanValoris = new AdeptusCustodes("Троян Валорис", 6, 6, 2
                 , 7, 5, 2);
 
-
         System.out.println(troyanValoris);
 
     }

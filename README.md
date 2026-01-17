@@ -1,4 +1,4 @@
-# Warhammer 40k Simulator
+# Warhammer 40k Simulator v. 0.0.1
 
 Компьютерная симуляция настольной игры Warhammer 40,000 (10-я редакция) на Java.
 

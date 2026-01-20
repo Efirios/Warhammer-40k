@@ -19,9 +19,3 @@
 - Графический интерфейс (JavaFX)
 - Поддержка нескольких фракций
 
-## Быстрый старт
-```bash
-git clone https://github.com/SMIRAS-A/warhammer40k-sim.git
-cd warhammer40k-sim
-mvn clean install
-

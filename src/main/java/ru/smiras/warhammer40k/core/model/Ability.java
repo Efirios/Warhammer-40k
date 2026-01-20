@@ -4,7 +4,7 @@ import ru.smiras.warhammer40k.core.rules.*;
 import ru.smiras.warhammer40k.core.util.*;
 import ru.smiras.warhammer40k.game.state.*;
 
-interface Ability {
+public interface Ability {
 
     int UNLIMITED = Integer.MAX_VALUE;
 

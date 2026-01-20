@@ -5,7 +5,7 @@ import java.util.*;
 
 public class SentinelBlade {
 
-    public static WeaponProfile createSentinelBladeRanged() {
+    public static WeaponProfile createRanged() {
         return new WeaponProfile(
                 "Sentinel Blade",
                 12,
@@ -20,7 +20,7 @@ public class SentinelBlade {
         );
     }
 
-    public static WeaponProfile createSentinelBladeMelee() {
+    public static WeaponProfile createMelee() {
         return new WeaponProfile(
                 "Sentinel Blade",
                 0,

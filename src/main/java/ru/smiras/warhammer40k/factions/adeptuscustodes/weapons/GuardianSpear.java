@@ -5,7 +5,7 @@ import java.util.*;
 
 public class GuardianSpear {
 
-    public static WeaponProfile createGuardianSpearRanged() {
+    public static WeaponProfile createRanged() {
         return new WeaponProfile(
                 "Guardian Spear",
                 24,
@@ -20,7 +20,7 @@ public class GuardianSpear {
         );
     }
 
-    public static WeaponProfile createGuardianSpearMelee() {
+    public static WeaponProfile createMelee() {
         return new WeaponProfile(
                 "Guardian Spear",
                 0,

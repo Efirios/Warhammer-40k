@@ -1,6 +1,7 @@
 package ru.smiras.warhammer40k.factions.worldeaters.units;
 
 import ru.smiras.warhammer40k.core.model.*;
+import ru.smiras.warhammer40k.factions.adeptuscustodes.abilities.DeepStrike;
 import ru.smiras.warhammer40k.factions.worldeaters.weapons.*;
 
 import java.util.List;
@@ -36,8 +37,15 @@ public class Angron extends Datasheet{
     );
 
     private static final List<WeaponProfile> WEAPONS = List.of(
-            SamniariusAndSpinegrinder.createSamniariusAndSpinegrinderStrike(),
-            SamniariusAndSpinegrinder.createSamniariusAndSpinegrinderSweep()
+            SamniariusAndSpinegrinder.createStrike(),
+            SamniariusAndSpinegrinder.createSweep()
+    );
+
+    private static final List<Ability> ABILITIES = List.of(
+            DeepStrike.create()
+    );
+
+    private static final List<Ability> FACTION_ABILITIES = List.of(
     );
 
     public Angron(String id) {
@@ -55,7 +63,9 @@ public class Angron extends Datasheet{
                 KEYWORDS,
                 FACTION_KEYWORDS,
                 POINTS_VALUES,
-                WEAPONS
+                WEAPONS,
+                ABILITIES,
+                FACTION_ABILITIES
         );
     }
 }

@@ -1,0 +1,129 @@
+package ru.smiras.warhammer40k.factions.adeptuscustodes.abilities;
+
+import ru.smiras.warhammer40k.core.model.Ability;
+import ru.smiras.warhammer40k.core.rules.AttackContext;
+import ru.smiras.warhammer40k.core.util.PhaseType;
+import ru.smiras.warhammer40k.game.state.UnitInstance;
+
+import java.util.Objects;
+import java.util.Scanner;
+
+public class MortialKatah implements Ability {
+
+    private static final Scanner SCANNER = new Scanner(System.in);
+
+    private int currentKathEffect = 0;
+
+    private static final MortialKatah INSTANCE = new MortialKatah();
+
+    private MortialKatah(){
+
+    }
+
+    public static MortialKatah create() {
+        return INSTANCE;
+    }
+
+    @Override
+    public String getName() {
+        return "Mortial Ka`tah";
+    }
+
+    @Override
+    public String getDescription() {
+        return "В начале Command phase выбирайте эффект: +1 to hit, +1 to wound или +1 to damage в ближнем бою до" +
+                " следующей Command phase.";
+    }
+
+    @Override
+    public void onPhaseStart(UnitInstance unit, PhaseType phase){
+
+        if (!unit.isAlive() || phase != PhaseType.COMMAND_PHASE) {
+            return;
+        }
+
+        while (true) {
+
+            currentKathEffect = 0;
+
+            System.out.println("Выберите эффект Martial Ka'tah:" +
+                    "\n1 - +1 к попаданию (Dacatarai)" +
+                    "\n2 - +1 к ранению (Kaptaris)" +
+                    "\n3 - +1 к урону (Calistus)");
+
+            String input = SCANNER.nextLine().trim();
+            try {
+                int choice = Integer.parseInt(input);
+
+                if (choice >= 1 && choice <= 3) {
+                    currentKathEffect = choice;
+                    break;
+                } else {
+                    System.out.println("Неверный выбор! Введите 1, 2 или 3.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Неверный ввод! Введите число 1, 2 или 3.");
+            }
+        }
+
+        if (currentKathEffect == 1) {
+            System.out.println("Выбран эффект: Dacatarai (+1 к попаданию)");
+        } else if (currentKathEffect == 2) {
+            System.out.println("Выбран эффект: Kaptaris (+1 к ранению)");
+        } else if (currentKathEffect == 3) {
+            System.out.println("Выбран эффект: Calistus (+1 к урону)");
+        }
+    }
+
+    @Override
+    public void onPhaseEnd(UnitInstance unit, PhaseType phase) {
+        if (phase == PhaseType.COMMAND_PHASE) {
+            currentKathEffect = 0;
+        }
+    }
+
+    @Override
+    public void modifyHitRoll(UnitInstance unit, AttackContext context) {
+        if (currentKathEffect == 1){
+            context.addHitModifier(1);
+        }
+    }
+
+    @Override
+    public void modifyWoundRoll(UnitInstance unit, AttackContext context) {
+        if (currentKathEffect == 2) {
+            context.addWoundModifier(1);
+        }
+    }
+
+    @Override
+    public void modifyDamageRoll(UnitInstance unit, AttackContext context) {
+        if (currentKathEffect == 3) {
+            context.addDamageModifier(1);
+        }
+    }
+
+    public boolean isActive(UnitInstance unit, PhaseType currentPhase) {
+        return unit.isAlive() && (currentPhase == PhaseType.COMMAND_PHASE || currentKathEffect != 0);
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " - " + getDescription();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MortialKatah mortialKatah = (MortialKatah) o;
+        return getName().equals(mortialKatah.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                getName());
+    }
+}
+

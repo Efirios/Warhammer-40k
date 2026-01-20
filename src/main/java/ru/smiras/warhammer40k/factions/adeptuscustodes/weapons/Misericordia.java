@@ -5,7 +5,7 @@ import java.util.*;
 
 public class Misericordia {
 
-    public static WeaponProfile createMisericordia() {
+    public static WeaponProfile create() {
         return new WeaponProfile(
                 "Misericordia",
                 0,

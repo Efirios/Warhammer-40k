@@ -5,7 +5,7 @@ import java.util.*;
 
 public class SamniariusAndSpinegrinder {
 
-    public static WeaponProfile createSamniariusAndSpinegrinderStrike() {
+    public static WeaponProfile createStrike() {
         return new WeaponProfile(
                 "Samniarius And Spinegrinder-Strike",
                 0,
@@ -20,7 +20,7 @@ public class SamniariusAndSpinegrinder {
         );
     }
 
-    public static WeaponProfile createSamniariusAndSpinegrinderSweep() {
+    public static WeaponProfile createSweep() {
         return new WeaponProfile(
                 "Samniarius And Spinegrinder-Sweep",
                 0,

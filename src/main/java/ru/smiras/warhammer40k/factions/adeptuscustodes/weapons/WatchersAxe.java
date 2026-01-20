@@ -6,7 +6,7 @@ import java.util.*;
 
 public class WatchersAxe {
 
-    public static WeaponProfile createWatchersAxe() {
+    public static WeaponProfile create() {
         return new WeaponProfile(
                 "Watcher's Axe",
                 0,

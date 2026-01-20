@@ -5,7 +5,7 @@ import java.util.*;
 
 public class EaglesScream {
 
-    public static WeaponProfile createEaglesScream() {
+    public static WeaponProfile create() {
         return new WeaponProfile(
                 "Eagle's Scream",
                 24,

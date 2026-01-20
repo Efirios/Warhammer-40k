@@ -21,10 +21,13 @@ public class Datasheet {
 
     private final List<WeaponProfile> weapons;
 
+    private final List<Ability> abilities;
+    private final List<Ability> factionAbilities;
+
     protected Datasheet(String id, String baseName, int baseMovement, int baseToughness, int baseSave,
             int baseWounds, int baseLeadership, int baseObjectiveControl, boolean hasInvulnerableSave,
             int invulnerableSaveValue, Set<Keyword> keywords, Set<Keyword> factionKeywords, int pointsValues,
-                        List<WeaponProfile> weapons) {
+                        List<WeaponProfile> weapons, List<Ability> abilities, List<Ability> factionAbilities) {
 
         if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("id не может быть пустым или содержать пробелы!");
@@ -87,6 +90,10 @@ public class Datasheet {
         this.pointsValues = pointsValues;
 
         this.weapons = List.copyOf(weapons);
+
+        this.abilities = List.copyOf(abilities);
+
+        this.factionAbilities = List.copyOf(factionAbilities);
     }
 
     public String getId() {
@@ -129,20 +136,8 @@ public class Datasheet {
         return Set.copyOf(keywords);
     }
 
-    public boolean hasKeyword(Keyword keyword) {
-        return keywords.contains(keyword);
-    }
-
     public Set<Keyword> getFactionKeywords() {
         return Set.copyOf(factionKeywords);
-    }
-
-    public boolean hasFactionKeyword(Keyword factionKeyword) {
-        return factionKeywords.contains(factionKeyword);
-    }
-
-    public boolean hasInvulnerableSave() {
-        return hasInvulnerableSave;
     }
 
     public int getEffectiveInvulnerableSave() {
@@ -154,13 +149,40 @@ public class Datasheet {
     }
 
     public List<WeaponProfile> getWeapons() {
-        return weapons;
+        return List.copyOf(weapons);
+    }
+
+    public List<Ability> getAbilities() {
+        return List.copyOf(abilities);
+    }
+
+    public List<Ability> getFactionAbilities() {
+        return List.copyOf(factionAbilities);
+    }
+
+    public boolean hasKeyword(Keyword keyword) {
+        return keywords.contains(keyword);
+    }
+
+    public boolean hasFactionKeyword(Keyword factionKeyword) {
+        return factionKeywords.contains(factionKeyword);
+    }
+
+    public boolean hasInvulnerableSave() {
+        return hasInvulnerableSave;
     }
 
     public boolean hasWeapon(WeaponProfile weapon) {
         return weapons.contains(weapon);
     }
 
+    public boolean hasAbilitie(Ability ability) {
+        return abilities.contains(ability);
+    }
+
+    public boolean hasFactionAbilitie(Ability ability) {
+        return factionAbilities.contains(ability);
+    }
 
     @Override
     public String toString() {
@@ -178,6 +200,8 @@ public class Datasheet {
                 ", FACTION KEYWORDS=" + factionKeywords +
                 ", PTS=" + pointsValues +
                 ", WEAPONS=" + weapons +
+                ", ABILITIES=" + abilities +
+                ", FACTION_ABILITIES=" + factionAbilities +
                 '}';
     }
 
@@ -197,6 +221,8 @@ public class Datasheet {
                 factionKeywords.equals(datasheet.factionKeywords) &&
                 getPointsValues() == datasheet.getPointsValues() &&
                 weapons.equals(datasheet.weapons) &&
+                abilities.equals(datasheet.abilities) &&
+                factionAbilities.equals(datasheet.factionAbilities) &&
                 Objects.equals(baseName, datasheet.baseName);
     }
 
@@ -215,14 +241,9 @@ public class Datasheet {
                 getKeywords(),
                 getFactionKeywords(),
                 getPointsValues(),
-                getWeapons());
+                getWeapons(),
+                getAbilities(),
+                getFactionAbilities()
+        );
     }
 }
-
-/**
- * Что логично делать следующим
- * Создать класс UnitInstance — это будет конкретный юнит в бою
- * (с текущими ранами, моделями, активными способностями и т.д.)
- * Написать простой тестовый класс, который создаёт Траяна, берёт его оружие и делает бросок урона через damageValue.roll()
- * Добавить DiceRoller в core.dice — отдельный класс для всех бросков d6, 2d6 и т.д.
- */

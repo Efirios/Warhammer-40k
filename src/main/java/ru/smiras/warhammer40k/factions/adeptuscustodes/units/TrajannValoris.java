@@ -1,6 +1,9 @@
 package ru.smiras.warhammer40k.factions.adeptuscustodes.units;
 
 import ru.smiras.warhammer40k.core.model.*;
+import ru.smiras.warhammer40k.factions.adeptuscustodes.abilities.DeepStrike;
+import ru.smiras.warhammer40k.factions.adeptuscustodes.abilities.FeelNoPain5;
+import ru.smiras.warhammer40k.factions.adeptuscustodes.abilities.MortialKatah;
 import ru.smiras.warhammer40k.factions.adeptuscustodes.weapons.EaglesScream;
 import ru.smiras.warhammer40k.factions.adeptuscustodes.weapons.WatchersAxe;
 
@@ -32,8 +35,17 @@ public class TrajannValoris extends Datasheet {
     );
 
     private static final List<WeaponProfile> WEAPONS = List.of(
-            EaglesScream.createEaglesScream(),
-            WatchersAxe.createWatchersAxe()
+            EaglesScream.create(),
+            WatchersAxe.create()
+    );
+
+    private static final List<Ability> ABILITIES = List.of(
+            DeepStrike.create(),
+            FeelNoPain5.create()
+    );
+
+    private static final List<Ability> FACTION_ABILITIES = List.of(
+            MortialKatah.create()
     );
 
     public TrajannValoris(String id) {
@@ -51,7 +63,9 @@ public class TrajannValoris extends Datasheet {
                 KEYWORDS,
                 FACTION_KEYWORDS,
                 POINTS_VALUES,
-                WEAPONS
+                WEAPONS,
+                ABILITIES,
+                FACTION_ABILITIES
         );
     }
 }

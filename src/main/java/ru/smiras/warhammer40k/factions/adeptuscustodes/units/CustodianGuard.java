@@ -1,6 +1,7 @@
 package ru.smiras.warhammer40k.factions.adeptuscustodes.units;
 
 import ru.smiras.warhammer40k.core.model.*;
+import ru.smiras.warhammer40k.factions.adeptuscustodes.abilities.DeepStrike;
 import ru.smiras.warhammer40k.factions.adeptuscustodes.weapons.*;
 
 import java.util.List;
@@ -31,11 +32,18 @@ public class CustodianGuard extends Datasheet {
     );
 
     private static final List<WeaponProfile> WEAPONS = List.of(
-            GuardianSpear.createGuardianSpearRanged(),
-            GuardianSpear.createGuardianSpearMelee(),
-            SentinelBlade.createSentinelBladeRanged(),
-            SentinelBlade.createSentinelBladeMelee(),
-            Misericordia.createMisericordia()
+            GuardianSpear.createRanged(),
+            GuardianSpear.createMelee(),
+            SentinelBlade.createRanged(),
+            SentinelBlade.createMelee(),
+            Misericordia.create()
+    );
+
+    private static final List<Ability> ABILITIES = List.of(
+            DeepStrike.create()
+    );
+
+    private static final List<Ability> FACTION_ABILITIES = List.of(
     );
 
     public CustodianGuard(String id) {
@@ -53,7 +61,9 @@ public class CustodianGuard extends Datasheet {
                 KEYWORDS,
                 FACTION_KEYWORDS,
                 POINTS_VALUES,
-                WEAPONS
+                WEAPONS,
+                ABILITIES,
+                FACTION_ABILITIES
         );
     }
 }

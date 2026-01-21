@@ -25,7 +25,7 @@ public class MortialKatah implements Ability {
 
     private static final Scanner SCANNER = new Scanner(System.in);
 
-    private int currentKathEffect = 0;
+    private KatahEffect activeKatahEffect = KatahEffect.NONE;
 
     private static final MortialKatah INSTANCE = new MortialKatah();
 
@@ -57,8 +57,6 @@ public class MortialKatah implements Ability {
 
         while (true) {
 
-            currentKathEffect = 0;
-
             System.out.println("Выберите эффект Mortial Ka'tah:" +
                     "\n1 - +1 к попаданию (Dacatarai)" +
                     "\n2 - +1 к ранению (Kaptaris)" +
@@ -69,7 +67,16 @@ public class MortialKatah implements Ability {
                 int choice = Integer.parseInt(input);
 
                 if (choice >= 1 && choice <= 3) {
-                    currentKathEffect = choice;
+                    if (choice == 1) {
+                        activeKatahEffect = KatahEffect.DACATARAI;
+                        System.out.println("Выбран эффект: Dacatarai (+1 к Hit)");
+                    } else if (choice == 2) {
+                        activeKatahEffect = KatahEffect.KAPTARIS;
+                        System.out.println("Выбран эффект: Kaptaris (+1 к Wound)");
+                    } else if (choice == 3) {
+                        activeKatahEffect = KatahEffect.CALISTUS;
+                        System.out.println("Выбран эффект: Calistus (+1 к Damage)");
+                    }
                     break;
                 } else {
                     System.out.println("Неверный выбор! Введите 1, 2 или 3.");
@@ -79,45 +86,39 @@ public class MortialKatah implements Ability {
             }
         }
 
-        if (currentKathEffect == 1) {
-            System.out.println("Выбран эффект: Dacatarai (+1 к попаданию)");
-        } else if (currentKathEffect == 2) {
-            System.out.println("Выбран эффект: Kaptaris (+1 к ранению)");
-        } else if (currentKathEffect == 3) {
-            System.out.println("Выбран эффект: Calistus (+1 к урону)");
-        }
+
     }
 
     @Override
     public void onPhaseEnd(UnitInstance unit, PhaseType phase) {
         if (phase == PhaseType.COMMAND_PHASE) {
-            currentKathEffect = 0;
+            activeKatahEffect = KatahEffect.NONE;
         }
     }
 
     @Override
     public void modifyHitRoll(UnitInstance unit, AttackContext context) {
-        if (currentKathEffect == 1){
+        if (activeKatahEffect == KatahEffect.DACATARAI) {
             context.addHitModifier(1);
         }
     }
 
     @Override
     public void modifyWoundRoll(UnitInstance unit, AttackContext context) {
-        if (currentKathEffect == 2) {
+        if (activeKatahEffect == KatahEffect.KAPTARIS) {
             context.addWoundModifier(1);
         }
     }
 
     @Override
     public void modifyDamageRoll(UnitInstance unit, AttackContext context) {
-        if (currentKathEffect == 3) {
+        if (activeKatahEffect == KatahEffect.CALISTUS) {
             context.addDamageModifier(1);
         }
     }
 
     public boolean isActive(UnitInstance unit, PhaseType currentPhase) {
-        return unit.isAlive() && (currentPhase == PhaseType.COMMAND_PHASE || currentKathEffect != 0);
+        return unit.isAlive() && (currentPhase == PhaseType.COMMAND_PHASE || activeKatahEffect != KatahEffect.NONE);
     }
 
     @Override

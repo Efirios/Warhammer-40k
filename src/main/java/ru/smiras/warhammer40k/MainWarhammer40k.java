@@ -24,7 +24,7 @@ public class MainWarhammer40k {
         Datasheet trajannValoris = new TrajannValoris("Trajann-1");
         Datasheet сustodianGuard_1 = new CustodianGuard("CustodianGuard-1");
         Datasheet angron = new Angron("Angron-1");
-        UnitInstance unitInstance = new UnitInstance();
+        UnitInstance unitInstance = new UnitInstance(trajannValoris);
 
         System.out.println(trajannValoris);
         System.out.println(сustodianGuard_1);

@@ -29,6 +29,7 @@ public class Datasheet {
     private final boolean hasInvulnerableSave;
     private final int invulnerableSaveValue;
     private final int pointsValues;
+    private final int baseModelCount;
 
     private final Set<Keyword> keywords;
     private final Set<Keyword> factionKeywords;
@@ -41,7 +42,8 @@ public class Datasheet {
     protected Datasheet(String id, String baseName, int baseMovement, int baseToughness, int baseSave,
             int baseWounds, int baseLeadership, int baseObjectiveControl, boolean hasInvulnerableSave,
             int invulnerableSaveValue, Set<Keyword> keywords, Set<Keyword> factionKeywords, int pointsValues,
-                        List<WeaponProfile> weapons, List<Ability> abilities, List<Ability> factionAbilities) {
+                        int baseModelCount, List<WeaponProfile> weapons, List<Ability> abilities,
+                        List<Ability> factionAbilities) {
 
         if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("id не может быть пустым или содержать пробелы!");
@@ -101,6 +103,8 @@ public class Datasheet {
         if (pointsValues < 0) {
             throw new IllegalArgumentException("Points Values не может быть меньше 0!");
         }
+        this.baseModelCount = baseModelCount;
+
         this.pointsValues = pointsValues;
 
         this.weapons = List.copyOf(weapons);
@@ -162,6 +166,10 @@ public class Datasheet {
         return pointsValues;
     }
 
+    public int getBaseModelCount() {
+        return baseModelCount;
+    }
+
     public List<WeaponProfile> getWeapons() {
         return List.copyOf(weapons);
     }
@@ -213,6 +221,7 @@ public class Datasheet {
                 ", KEYWORDS=" + keywords +
                 ", FACTION KEYWORDS=" + factionKeywords +
                 ", PTS=" + pointsValues +
+                ", ModelCount=" + baseModelCount +
                 ", WEAPONS=" + weapons +
                 ", ABILITIES=" + abilities +
                 ", FACTION_ABILITIES=" + factionAbilities +
@@ -234,6 +243,7 @@ public class Datasheet {
                 keywords.equals(datasheet.keywords) &&
                 factionKeywords.equals(datasheet.factionKeywords) &&
                 getPointsValues() == datasheet.getPointsValues() &&
+                getBaseModelCount() == datasheet.getBaseModelCount() &&
                 weapons.equals(datasheet.weapons) &&
                 abilities.equals(datasheet.abilities) &&
                 factionAbilities.equals(datasheet.factionAbilities) &&
@@ -255,6 +265,7 @@ public class Datasheet {
                 getKeywords(),
                 getFactionKeywords(),
                 getPointsValues(),
+                getBaseModelCount(),
                 getWeapons(),
                 getAbilities(),
                 getFactionAbilities()

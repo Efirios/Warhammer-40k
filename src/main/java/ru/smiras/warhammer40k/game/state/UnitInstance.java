@@ -23,6 +23,7 @@
 
 package ru.smiras.warhammer40k.game.state;
 
+import com.sun.source.tree.IfTree;
 import ru.smiras.warhammer40k.core.model.*;
 import ru.smiras.warhammer40k.factions.adeptuscustodes.abilities.KatahEffect;
 
@@ -33,6 +34,7 @@ public class UnitInstance {
     private final Datasheet datasheet;
     private int remainingWounds; // текущее значение W
     private int remainingModels; // оставшиеся модели (для отрядов)
+    private int currentOC;
     private boolean isBattleShoked; // статус Battle-shocked
     private boolean isActivatedThisPhase; // активирован ли в текущей фазе
 
@@ -42,17 +44,108 @@ public class UnitInstance {
 
     private KatahEffect currentMortialKatahEffect; //текущее состояние Martial Ka'tah (enum)
 
-    public UnitInstance(Datasheet datasheet){
+    public UnitInstance(Datasheet datasheet, int currentOC){
         this.datasheet = datasheet;
+        remainingWounds = datasheet.getBaseWounds();
+        remainingModels = datasheet.getBaseModelCount();
+        activeAbilities = new ArrayList<>(datasheet.getAbilities());
+        usesThisBattle = new HashMap<>();
+        usesThisPhase = new HashMap<>();
+        currentMortialKatahEffect = KatahEffect.NONE;
+        isBattleShoked = false;
+        isActivatedThisPhase = false;
+        currentOC = remainingModels * datasheet.getBaseObjectiveControl();
     }
 
+    public Datasheet getDatasheet() {
+        return datasheet;
+    }
+
+    public int getRemainingWounds() {
+        return remainingWounds;
+    }
+
+    public int getRemainingModels() {
+        return remainingModels;
+    }
+
+    public int getCurrentOC() {
+        return currentOC;
+    }
+
+    public boolean isBattleShoked() {
+        return isBattleShoked;
+    }
+
+    public boolean isActivatedThisPhase() {
+        return isActivatedThisPhase;
+    }
+
+    public Map<Ability, Integer> getUsesThisBattle() {
+        return usesThisBattle;
+    }
+
+    public Map<Ability, Integer> getUsesThisPhase() {
+        return usesThisPhase;
+    }
+
+    public List<Ability> getActiveAbilities() {
+        return activeAbilities;
+    }
+
+    public KatahEffect getCurrentMortialKatahEffect() {
+        return currentMortialKatahEffect;
+    }
+
+    public int getObjectiveControl() {
+        return currentOC; }
+
     public boolean isAlive() {
-        if (datasheet.getBaseWounds() < 1){
+        if (remainingModels <= 0){
             return false;
         } else {
             return true;
         }
     }
 
+    private void onModelDestroyed() {
+        // Пока пусто — в будущем здесь будут триггеры способностей
+    }
 
+    private void onUnitDestroyed() {
+        // Пока пусто — в будущем здесь будут триггеры способностей
+    }
+
+    public int receiveDamage(int damage) {
+        if (damage <= 0 || remainingModels <= 0) {
+            return 0;
+        }
+
+        int lostModels = 0;
+
+        remainingWounds -= damage;
+
+        while (remainingWounds <= 0 && remainingModels > 1) {
+            lostModels++;
+            remainingModels -= 1;
+            remainingWounds += datasheet.getBaseWounds();
+        }
+
+        if (remainingModels == 1 && remainingWounds <= 0) {
+            lostModels++;
+            remainingModels = 0;
+            remainingWounds = 0;
+        }
+
+        currentOC = remainingModels * datasheet.getBaseObjectiveControl();
+
+        if (lostModels > 0) {
+            onModelDestroyed();
+        }
+        if (remainingModels <= 0) {
+            onUnitDestroyed();
+        }
+
+        return lostModels;
+    }
 }

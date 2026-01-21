@@ -32,6 +32,7 @@ public class TrajannValoris extends Datasheet {
     private static final boolean HAS_INVULNERABLE = true;
     private static final int INVULNERABLE_VALUE = 4;
     private static final int POINTS_VALUES = 180;
+    private static final int MODEL_COUNT = 1;
 
     private static final Set<Keyword> KEYWORDS = Set.of(
             Keyword.INFANTRY,
@@ -74,6 +75,7 @@ public class TrajannValoris extends Datasheet {
                 KEYWORDS,
                 FACTION_KEYWORDS,
                 POINTS_VALUES,
+                MODEL_COUNT,
                 WEAPONS,
                 ABILITIES,
                 FACTION_ABILITIES

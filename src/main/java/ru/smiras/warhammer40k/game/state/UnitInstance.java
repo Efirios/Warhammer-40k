@@ -23,7 +23,6 @@
 
 package ru.smiras.warhammer40k.game.state;
 
-import com.sun.source.tree.IfTree;
 import ru.smiras.warhammer40k.core.model.*;
 import ru.smiras.warhammer40k.factions.adeptuscustodes.abilities.KatahEffect;
 

@@ -1,3 +1,17 @@
+/**
+ * Шаблон (datasheet) юнита из правил Warhammer 40,000 10-й редакции.
+ * Содержит неизменяемые базовые характеристики юнита: движение, стойкость, спасбросок, раны,
+ * лидерство, контроль целей, инвуль, очки, ключевые слова, фракционные ключевые слова,
+ * список оружия и список способностей (обычных и фракционных).
+ *
+ * Реализует правила datasheet'ов из кодекса: все характеристики берутся из официальных
+ * профилей юнита и не меняются в течение игры (кроме текущего состояния в UnitInstance).
+ *
+ * Используется для создания конкретных экземпляров юнитов в бою (UnitInstance).
+ * Оружие и способности хранятся как списки, чтобы поддерживать юниты с несколькими видами
+ * оружия (Custodian Guard с Guardian Spear и Sentinel Blade) и несколькими способностями.
+ */
+
 package ru.smiras.warhammer40k.core.model;
 
 import java.util.*;
@@ -176,11 +190,11 @@ public class Datasheet {
         return weapons.contains(weapon);
     }
 
-    public boolean hasAbilitie(Ability ability) {
+    public boolean hasAbility(Ability ability) {
         return abilities.contains(ability);
     }
 
-    public boolean hasFactionAbilitie(Ability ability) {
+    public boolean hasFactionAbility(Ability ability) {
         return factionAbilities.contains(ability);
     }
 

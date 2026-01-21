@@ -1,3 +1,14 @@
+/**
+ * Шаблон (datasheet) персонажа Trajann Valoris — Captain-General Adeptus Custodes из кодекса
+ * Adeptus Custodes 10-й редакции.
+ *
+ * Реализует правила юнита Trajann Valoris: характеристики (M6", T6, Sv2+/4++, W7, Ld5, OC2),
+ * оружие (Eagle's Scream и Watcher's Axe), ключевые слова (EPIC_HERO, CHARACTER, INFANTRY),
+ * способности (Deep Strike, Feel No Pain 5+, Martial Ka'tah и др.).
+ *
+ * Наследует Datasheet и передаёт свои характеристики, оружие и способности в супер-конструктор.
+ */
+
 package ru.smiras.warhammer40k.factions.adeptuscustodes.units;
 
 import ru.smiras.warhammer40k.core.model.*;

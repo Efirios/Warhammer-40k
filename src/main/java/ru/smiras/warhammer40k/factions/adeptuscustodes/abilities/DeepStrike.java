@@ -1,7 +1,19 @@
+/**
+ * Способность Deep Strike (Глубокий удар / Стратегический резерв) из основных правил
+ * Warhammer 40,000 10-й редакции (Core Rules).
+ *
+ * Реализует возможность разместить юнит в Strategic Reserves вместо развёртывания на столе,
+ * а затем вывести его в Reinforcement step любой из ваших Movement phases (в пределах 9"
+ * от кромки поля боя и более 9" от вражеских моделей). Юнит не может выйти в первом раунде,
+ * а если не вышел до конца 3-го раунда — считается уничтоженным.
+ *
+ * Активируется в фазе Reinforcement (Movement phase). Обычно пассивная — проверяется в isActive
+ * и может блокировать развёртывание в начале игры.
+ */
+
 package ru.smiras.warhammer40k.factions.adeptuscustodes.abilities;
 
 import ru.smiras.warhammer40k.core.model.Ability;
-
 import java.util.Objects;
 
 public class DeepStrike implements Ability {

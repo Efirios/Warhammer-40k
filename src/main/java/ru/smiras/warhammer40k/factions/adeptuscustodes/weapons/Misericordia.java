@@ -1,3 +1,12 @@
+/**
+ * Профиль оружия Misericordia (дополнительное оружие Custodian Guard) из кодекса Adeptus Custodes
+ * 10-й редакции.
+ *
+ * Реализует характеристики: Melee, 5A, WS2+, S5, AP-2, Damage 1.
+ *
+ * Создаётся через фабричный метод create() и используется как дополнительное оружие в ближнем бою.
+ */
+
 package ru.smiras.warhammer40k.factions.adeptuscustodes.weapons;
 
 import ru.smiras.warhammer40k.core.model.*;

@@ -1,3 +1,16 @@
+/**
+ * Фракционная способность Adeptus Custodes — Martial Ka'tah из кодекса Adeptus Custodes
+ * (10-я редакция Warhammer 40,000).
+ *
+ * Реализует правила Martial Ka'tah: в начале Command phase игрок выбирает один эффект
+ * (Dacatarai — +1 to hit, Kaptaris — +1 to wound, Calistus — +1 to damage) для юнита
+ * в ближнем бою до следующей Command phase.
+ *
+ * Выбор происходит в методе onPhaseStart (консольный ввод для прототипа).
+ * Эффект применяется в modifyHitRoll / modifyWoundRoll / modifyDamageRoll.
+ * Сбрасывается в onPhaseEnd или перед новым выбором.
+ */
+
 package ru.smiras.warhammer40k.factions.adeptuscustodes.abilities;
 
 import ru.smiras.warhammer40k.core.model.Ability;
@@ -46,7 +59,7 @@ public class MortialKatah implements Ability {
 
             currentKathEffect = 0;
 
-            System.out.println("Выберите эффект Martial Ka'tah:" +
+            System.out.println("Выберите эффект Mortial Ka'tah:" +
                     "\n1 - +1 к попаданию (Dacatarai)" +
                     "\n2 - +1 к ранению (Kaptaris)" +
                     "\n3 - +1 к урону (Calistus)");

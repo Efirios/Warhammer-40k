@@ -1,3 +1,13 @@
+/**
+ * Шаблон (datasheet) отряда Custodian Guard из кодекса Adeptus Custodes 10-й редакции.
+ *
+ * Реализует правила юнита Custodian Guard: характеристики (M6", T6, Sv2+/4++, W3 на модель),
+ * оружие (Guardian Spear и/или Sentinel Blade + Misericordia), ключевые слова (BATTLELINE, INFANTRY),
+ * способности (Deep Strike, Martial Ka'tah и др.).
+ *
+ * Поддерживает несколько вариантов оружия (ranged + melee для каждого типа). Наследует Datasheet.
+ */
+
 package ru.smiras.warhammer40k.factions.adeptuscustodes.units;
 
 import ru.smiras.warhammer40k.core.model.*;

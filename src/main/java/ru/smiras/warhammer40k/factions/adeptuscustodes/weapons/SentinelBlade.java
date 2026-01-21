@@ -1,3 +1,12 @@
+/**
+ * Профиль оружия Sentinel Blade (альтернативное оружие Custodian Guard) из кодекса Adeptus Custodes
+ * 10-й редакции.
+ *
+ * Реализует два режима: Ranged (12", Assault, Pistol, 2A, BS2+, S4, AP-1, D2) и Melee (5A, WS2+, S6, AP-2, D1).
+ *
+ * Создаётся через фабричные методы createRanged() и createMelee().
+ */
+
 package ru.smiras.warhammer40k.factions.adeptuscustodes.weapons;
 
 import ru.smiras.warhammer40k.core.model.*;

@@ -1,3 +1,11 @@
+/**
+ * Профиль оружия Watcher's Axe (оружие Траяна Валориса) из кодекса Adeptus Custodes 10-й редакции.
+ *
+ * Реализует характеристики: Melee, 6A, WS2+, S10, AP-2, Damage 3.
+ *
+ * Создаётся через фабричный метод create() и добавляется в Datasheet юнита.
+ */
+
 package ru.smiras.warhammer40k.factions.adeptuscustodes.weapons;
 
 import ru.smiras.warhammer40k.core.model.*;

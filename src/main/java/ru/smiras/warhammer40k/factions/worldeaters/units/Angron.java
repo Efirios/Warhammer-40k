@@ -1,3 +1,14 @@
+/**
+ * Шаблон (datasheet) персонажа Angron — Daemon Primarch World Eaters из кодекса World Eaters
+ * 10-й редакции.
+ *
+ * Реализует правила юнита Angron: характеристики (M14", T11, Sv2+/4++, W16, Ld5, OC6),
+ * оружие (Samniarius and Spinegrinder — два режима: Strike и Sweep), ключевые слова (EPIC_HERO,
+ * MONSTER, CHARACTER, DAEMON, PRIMARCH), способности (Deep Strike и др.).
+ *
+ * Наследует Datasheet и передаёт свои характеристики, оружие и способности.
+ */
+
 package ru.smiras.warhammer40k.factions.worldeaters.units;
 
 import ru.smiras.warhammer40k.core.model.*;

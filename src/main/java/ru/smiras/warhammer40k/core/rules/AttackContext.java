@@ -1,3 +1,15 @@
+/**
+ * Контекст одной атаки (или серии атак) в правилах Warhammer 40,000 10-й редакции.
+ * Хранит всю информацию о текущей атаке: кто атакует, кто цель, какое оружие,
+ * в какой фазе, текущие броски, модификаторы, флаги (critical hit/wound, ignore save).
+ *
+ * Реализует цепочку расчёта атаки: hit roll → wound roll → save roll → damage.
+ * Способности (Ability) модифицируют этот контекст через методы add...Modifier, set...,
+ * cancelDamage() и т.д.
+ *
+ * Создаётся для каждой атаки и передаётся по цепочке методов Ability.
+ */
+
 package ru.smiras.warhammer40k.core.rules;
 
 import ru.smiras.warhammer40k.core.model.WeaponProfile;
@@ -126,5 +138,13 @@ public class AttackContext {
         isCriticalHit = false;
         isCriticalWound = false;
         ignoreSave = false;
+    }
+
+    public void setFinalHitRoll(int value) {
+        hitRoll = value - hitModifier;
+    }
+
+    public int getEffectiveDamage() {
+        return ignoreSave ? 0 : getFinalDamageRoll();
     }
 }

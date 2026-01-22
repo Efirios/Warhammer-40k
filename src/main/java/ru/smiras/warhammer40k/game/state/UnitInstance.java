@@ -47,13 +47,17 @@ public class UnitInstance {
         this.datasheet = datasheet;
         remainingWounds = datasheet.getBaseWounds();
         remainingModels = datasheet.getBaseModelCount();
-        activeAbilities = new ArrayList<>(datasheet.getAbilities());
+
+        activeAbilities = new ArrayList<>();
+        activeAbilities.addAll(datasheet.getAbilities());
+        activeAbilities.addAll(datasheet.getFactionAbilities());
+
         usesThisBattle = new HashMap<>();
         usesThisPhase = new HashMap<>();
         currentMortialKatahEffect = KatahEffect.NONE;
         isBattleShoked = false;
         isActivatedThisPhase = false;
-        currentOC = remainingModels * datasheet.getBaseObjectiveControl();
+        currentOC = recalculateOC();
     }
 
     public Datasheet getDatasheet() {
@@ -96,6 +100,27 @@ public class UnitInstance {
         return currentMortialKatahEffect;
     }
 
+    public void setCurrentMortialKatahEffect(KatahEffect katahEffect) {
+        this.currentMortialKatahEffect = katahEffect;
+    }
+
+    public void setIsBattleShoked(boolean volue) {
+        this.isBattleShoked = volue;
+        recalculateOC();
+    }
+
+    public void setIsActivatedThisPhase(boolean volue) {
+        this.isActivatedThisPhase = volue;
+    }
+
+    public int recalculateOC() {
+        int value = 0;
+        if (remainingModels != 0 && !isBattleShoked) {
+            value = remainingModels * datasheet.getBaseObjectiveControl();
+        }
+        return currentOC = value;
+    }
+
     public int getObjectiveControl() {
         return currentOC; }
 
@@ -136,11 +161,12 @@ public class UnitInstance {
             remainingWounds = 0;
         }
 
-        currentOC = remainingModels * datasheet.getBaseObjectiveControl();
+        recalculateOC();
 
         if (lostModels > 0) {
             onModelDestroyed();
         }
+
         if (remainingModels <= 0) {
             onUnitDestroyed();
         }

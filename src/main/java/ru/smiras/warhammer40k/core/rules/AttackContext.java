@@ -57,6 +57,10 @@ public class AttackContext {
         return phase;
     }
 
+    public int getHitRoll() {
+        return hitRoll;
+    }
+
     public int getFinalHitRoll() {
         return hitRoll + hitModifier;
     }
@@ -78,7 +82,7 @@ public class AttackContext {
     }
 
     public void addHitModifier(int value) {
-        hitModifier += value;
+        hitModifier = value;
     }
 
     public void setCriticalHit(boolean value) {

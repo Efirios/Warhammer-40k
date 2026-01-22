@@ -43,7 +43,7 @@ public class UnitInstance {
 
     private KatahEffect currentMortialKatahEffect; //текущее состояние Martial Ka'tah (enum)
 
-    public UnitInstance(Datasheet datasheet, int currentOC){
+    public UnitInstance(Datasheet datasheet){
         this.datasheet = datasheet;
         remainingWounds = datasheet.getBaseWounds();
         remainingModels = datasheet.getBaseModelCount();

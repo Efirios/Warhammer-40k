@@ -12,6 +12,7 @@ package ru.smiras.warhammer40k.factions.adeptuscustodes.units;
 
 import ru.smiras.warhammer40k.core.model.*;
 import ru.smiras.warhammer40k.factions.adeptuscustodes.abilities.DeepStrike;
+import ru.smiras.warhammer40k.factions.adeptuscustodes.abilities.MortialKatah;
 import ru.smiras.warhammer40k.factions.adeptuscustodes.weapons.*;
 
 import java.util.List;
@@ -55,6 +56,7 @@ public class CustodianGuard extends Datasheet {
     );
 
     private static final List<Ability> FACTION_ABILITIES = List.of(
+            MortialKatah.create()
     );
 
     public CustodianGuard(String id) {

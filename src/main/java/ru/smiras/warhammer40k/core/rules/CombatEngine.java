@@ -27,7 +27,7 @@ import ru.smiras.warhammer40k.game.state.UnitInstance;
 public class CombatEngine {
 
     public void resolveAttack(UnitInstance attacker, UnitInstance target, WeaponProfile weapon, PhaseType phase) {
-
+        System.out.println("\n--- Атака: " + weapon.getName() + " ---");
 
         for (int i = 0; i < weapon.getAttacks(); i++) {
             AttackContext context = new AttackContext(attacker, target, weapon, phase);
@@ -36,33 +36,53 @@ public class CombatEngine {
 
             if (isHit) {
                 System.out.print("Попадание (Кубик: " + context.getHitRoll() +
-                        " -> Итого: " + context.getFinalHitRoll() + ")");
+                        " -> Итого: " + context.getFinalHitRoll() + ") ");
 
                 boolean isWounded = resolveWoundRoll(context);
 
                 if (isWounded) {
-                    System.out.print("  -> Ранение! (Бросок: " + context.getWoundRoll() +
-                            " -> Итого: " + context.getFinalWoundRoll() + ")");
+                    System.out.print("-> Ранение (Бросок: " + context.getWoundRoll() +
+                            " -> Итого: " + context.getFinalWoundRoll() + ") ");
 
-                    boolean isSaved = resolveSaveRoll(context);
+                    boolean isDevastating = context.isCriticalWound() &&
+                            context.getWeapon().getWeaponKeywords().contains(Keyword.DEVASTATING_WOUNDS);
 
-                    if (isSaved) {
-                        System.out.println("  -> Атака отбита! (Бросок: " + context.getSaveRoll() +
-                                " -> Итого: " + context.getFinalSaveRoll() + ")");
+                    int lostModels = 0;
+                    boolean damageWasDealt = false;
 
+                    if (isDevastating) {
+                        System.out.println("-> DEVASTATING WOUNDS! (Спасброски игнорируются)");
+                        lostModels = resolveDamage(context);
+                        damageWasDealt = true;
                     } else {
-                        System.out.println("  -> Урон нанесён. (Бросок: " + context.getSaveRoll() +
-                                " -> Итого: " + context.getFinalSaveRoll() + ")");
+                        boolean isSaved = resolveSaveRoll(context);
+
+                        if (isSaved) {
+                            System.out.println("-> ОТБИТО (Бросок: " + context.getSaveRoll() +
+                                    " -> Итого: " + context.getFinalSaveRoll() + ")");
+                        } else {
+                            System.out.println("-> Провал сейва (Бросок: " + context.getSaveRoll() +
+                                    " -> Итого: " + context.getFinalSaveRoll() + ")");
+                            lostModels = resolveDamage(context);
+                            damageWasDealt = true;
+                        }
+                    }
+
+                    if (damageWasDealt) {
+                        if (lostModels > 0) {
+                            System.out.println("      !!! МОДЕЛЬ УНИЧТОЖЕНА !!!");
+                        }
+
+                        System.out.println("      [Цель: " + context.getTarget().getRemainingModels() +
+                                " моделей, " + context.getTarget().getRemainingWounds() + " Wounds]");
                     }
 
                 } else {
-                    System.out.println("  -> Не пробил броню. (Бросок: " + context.getWoundRoll() +
-                            " -> Итого: " + context.getFinalWoundRoll() + ")");
+                    System.out.println("-> Не пробил (Бросок: " + context.getWoundRoll() + ")");
                 }
 
             } else {
-                System.out.println("Промах. (Кубик: " + context.getHitRoll() +
-                        " -> Итого: " + context.getFinalHitRoll() + ")");
+                System.out.println("Промах (Кубик: " + context.getHitRoll() + ")");
             }
         }
     }
@@ -146,6 +166,10 @@ public class CombatEngine {
 
         context.setSaveRoll(diceRoll);
 
+        for (Ability ability : context.getTarget().getActiveAbilities()) {
+            ability.modifySaveRoll(context.getTarget(), context);
+        }
+
         if (diceRoll == 1) {
             return false;
         } else if (context.getFinalSaveRoll() >= bestSave) {
@@ -153,5 +177,27 @@ public class CombatEngine {
         }
 
         return false;
+    }
+
+    private int resolveDamage(AttackContext context) {
+        context.setDamageRoll(context.getWeapon().getDamageValue().roll());
+
+        for (Ability ability : context.getAttacker().getActiveAbilities()){
+            ability.modifyDamageRoll(context.getAttacker(), context);
+        }
+
+        for (Ability ability : context.getTarget().getActiveAbilities()){
+            ability.modifyDamageRoll(context.getTarget(), context);
+        }
+
+        for (Ability ability : context.getTarget().getActiveAbilities()){
+            ability.applyAfterSaveRoll(context.getTarget(), context);
+        }
+
+        int damage = context.getFinalDamageRoll();
+
+        int lostModels = context.getTarget().receiveDamage(damage);
+
+        return lostModels;
     }
 }

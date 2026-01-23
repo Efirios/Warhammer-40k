@@ -15,6 +15,7 @@ import ru.smiras.warhammer40k.core.model.WeaponProfile;
 import ru.smiras.warhammer40k.core.rules.CombatEngine;
 import ru.smiras.warhammer40k.core.util.PhaseType;
 import ru.smiras.warhammer40k.factions.adeptuscustodes.abilities.MortialKatah;
+import ru.smiras.warhammer40k.factions.adeptuscustodes.units.CustodianGuard;
 import ru.smiras.warhammer40k.factions.adeptuscustodes.units.TrajannValoris;
 import ru.smiras.warhammer40k.factions.worldeaters.units.Angron;
 import ru.smiras.warhammer40k.game.state.UnitInstance;
@@ -22,30 +23,63 @@ import ru.smiras.warhammer40k.game.state.UnitInstance;
 public class MainWarhammer40k {
     public static void main(String[] args) {
         Datasheet trajannData = new TrajannValoris("Trajann");
+        Datasheet custodianGuardData1 = new CustodianGuard("Custodian Guard");
         Datasheet angronData = new Angron("Angron");
 
         UnitInstance trajannUnit = new UnitInstance(trajannData);
+        UnitInstance custodianGuardUnit1 = new UnitInstance(custodianGuardData1);
         UnitInstance angronUnit = new UnitInstance(angronData);
 
         CombatEngine engine = new CombatEngine();
 
-        // Оружие: Watcher's Axe (S10)
-        WeaponProfile axe = trajannUnit.getDatasheet().getWeapons().get(1);
-        System.out.println("Оружие:" + axe);
-
-        System.out.println("Сценарий: Траян (S10) бьет Ангрона (T11).");
-        System.out.println("Нужно 5+ для пробития.\n");
-
-        // --- ТЕСТ 1: Без стоек ---
-        System.out.println("--- ТЕСТ 1: Обычные атаки ---");
-        engine.resolveAttack(trajannUnit, angronUnit, axe, PhaseType.FIGHT_PHASE);
-
-        // --- ТЕСТ 2: Включаем Kaptaris (+1 to Wound) ---
-        System.out.println("\n--- Активация Kaptaris (+1 to Wound)... ---");
-        // Выбери в консоли цифру 2
+        // Подготовка: Выбираем стойку перед началом замеса
+        System.out.println("--- Фаза Командования: Траян выбирает стойку ---");
         MortialKatah.create().onPhaseStart(trajannUnit, PhaseType.COMMAND_PHASE);
 
-        System.out.println("\n--- ТЕСТ 2: Атаки с +1 на ранение (теперь пробиваем на 4+) ---");
-        engine.resolveAttack(trajannUnit, angronUnit, axe, PhaseType.FIGHT_PHASE);
+        System.out.println("--- Фаза Командования: Custodian Guard выбирают стойку ---");
+        MortialKatah.create().onPhaseStart(custodianGuardUnit1, PhaseType.COMMAND_PHASE);
+
+        int round = 1;
+
+        // БОЙ НАСМЕРТЬ
+        while (trajannUnit.isAlive() && angronUnit.isAlive()) {
+            System.out.println("\n========= РАУНД " + round + " =========");
+
+            // --- ХОД ТРАЯНА ---
+            System.out.println("\n[Траян атакует Ангрона]");
+            // Оружие: Watcher's Axe (index 1)
+            WeaponProfile axe = trajannUnit.getDatasheet().getWeapons().get(1);
+            engine.resolveAttack(trajannUnit, angronUnit, axe, PhaseType.FIGHT_PHASE);
+
+            if (!angronUnit.isAlive()) {
+                System.out.println("\n*** АНГРОН ПОВЕРЖЕН! ПОБЕДА ИМПЕРИУМА! ***");
+                break;
+            }
+
+            // --- ХОД Custodian Guard ---
+            System.out.println("\n[Custodian Guard атакует Ангрона]");
+            // Оружие: Watcher's Axe (index 1)
+            WeaponProfile spear = custodianGuardUnit1.getDatasheet().getWeapons().get(1);
+            engine.resolveAttack(custodianGuardUnit1, angronUnit, spear, PhaseType.FIGHT_PHASE);
+
+            if (!angronUnit.isAlive()) {
+                System.out.println("\n*** АНГРОН ПОВЕРЖЕН! ПОБЕДА ИМПЕРИУМА! ***");
+                break;
+            }
+
+            // --- ХОД АНГРОНА ---
+            System.out.println("\n[Ангрон атакует Траяна]");
+            // Оружие: Samniarius Strike (index 0) - бьем профилем Strike (сильным)
+            WeaponProfile strike = angronUnit.getDatasheet().getWeapons().get(0);
+
+            engine.resolveAttack(angronUnit, trajannUnit, strike, PhaseType.FIGHT_PHASE);
+
+            if (!trajannUnit.isAlive()) {
+                System.out.println("\n*** ТРАЯН ПАЛ! ЧЕРЕПА ДЛЯ ТРОНА ЧЕРЕПОВ! ***");
+                break;
+            }
+
+            round++;
+        }
     }
 }

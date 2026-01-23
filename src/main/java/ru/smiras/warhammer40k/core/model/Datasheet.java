@@ -17,7 +17,6 @@ package ru.smiras.warhammer40k.core.model;
 import java.util.*;
 
 public class Datasheet {
-
     private final String id;
     private final String baseName;
     private final int baseMovement;

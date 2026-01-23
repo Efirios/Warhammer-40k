@@ -21,36 +21,31 @@ import ru.smiras.warhammer40k.game.state.UnitInstance;
 
 public class MainWarhammer40k {
     public static void main(String[] args) {
+        Datasheet trajannData = new TrajannValoris("Trajann");
+        Datasheet angronData = new Angron("Angron");
 
-        Datasheet trajannValoris = new TrajannValoris("Trajann-1");
-        Datasheet angron = new Angron("Angron-1");
-
-        UnitInstance trajannUnit = new UnitInstance(trajannValoris);
-        UnitInstance angronUnit = new UnitInstance(angron);
+        UnitInstance trajannUnit = new UnitInstance(trajannData);
+        UnitInstance angronUnit = new UnitInstance(angronData);
 
         CombatEngine engine = new CombatEngine();
 
-        // --- ТЕСТ 1: Стрельба без баффов ---
-        System.out.println("\n--- ТЕСТ 1: Траян стреляет в Ангрона (Без стоек) ---");
-        // Берем первое оружие Траяна (Eagle's Scream)
-        WeaponProfile gun = trajannUnit.getDatasheet().getWeapons().get(0);
-        engine.resolveAttack(trajannUnit, angronUnit, gun, PhaseType.SHOOTING_PHASE);
+        // Оружие: Watcher's Axe (S10)
+        WeaponProfile axe = trajannUnit.getDatasheet().getWeapons().get(1);
+        System.out.println("Оружие:" + axe);
 
-        // --- ТЕСТ 2: Активируем Martial Ka'tah (Dacatarai +1 Hit) ---
-        System.out.println("\n--- Активация способности... ---");
-        // Вызываем событие начала фазы (тут тебе предложат выбрать стойку - выбери 1)
+        System.out.println("Сценарий: Траян (S10) бьет Ангрона (T11).");
+        System.out.println("Нужно 5+ для пробития.\n");
+
+        // --- ТЕСТ 1: Без стоек ---
+        System.out.println("--- ТЕСТ 1: Обычные атаки ---");
+        engine.resolveAttack(trajannUnit, angronUnit, axe, PhaseType.FIGHT_PHASE);
+
+        // --- ТЕСТ 2: Включаем Kaptaris (+1 to Wound) ---
+        System.out.println("\n--- Активация Kaptaris (+1 to Wound)... ---");
+        // Выбери в консоли цифру 2
         MortialKatah.create().onPhaseStart(trajannUnit, PhaseType.COMMAND_PHASE);
 
-
-        // --- ТЕСТ 3: Стрельба с баффом (Должна быть БЕЗ изменений, т.к. это стрельба) ---
-        System.out.println("\n--- ТЕСТ 3: Траян стреляет (Стойка Dacatarai - не должна работать на стрельбу) ---");
-        engine.resolveAttack(trajannUnit, angronUnit, gun, PhaseType.SHOOTING_PHASE);
-
-
-        // --- ТЕСТ 4: Ближний бой с баффом (Должен быть +1 к Hit) ---
-        System.out.println("\n--- ТЕСТ 4: Траян бьет топором (Стойка Dacatarai - должна дать +1) ---");
-        // Берем второе оружие (Watcher's Axe)
-        WeaponProfile axe = trajannUnit.getDatasheet().getWeapons().get(1);
+        System.out.println("\n--- ТЕСТ 2: Атаки с +1 на ранение (теперь пробиваем на 4+) ---");
         engine.resolveAttack(trajannUnit, angronUnit, axe, PhaseType.FIGHT_PHASE);
     }
 }

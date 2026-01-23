@@ -19,6 +19,7 @@ package ru.smiras.warhammer40k.core.rules;
 
 import ru.smiras.warhammer40k.core.dice.DiceRoller;
 import ru.smiras.warhammer40k.core.model.Ability;
+import ru.smiras.warhammer40k.core.model.Keyword;
 import ru.smiras.warhammer40k.core.model.WeaponProfile;
 import ru.smiras.warhammer40k.core.util.PhaseType;
 import ru.smiras.warhammer40k.game.state.UnitInstance;
@@ -34,8 +35,31 @@ public class CombatEngine {
             boolean isHit = resolveHitRoll(context);
 
             if (isHit) {
-                System.out.println("Попадание! (Кубик: " + context.getHitRoll() +
+                System.out.print("Попадание (Кубик: " + context.getHitRoll() +
                         " -> Итого: " + context.getFinalHitRoll() + ")");
+
+                boolean isWounded = resolveWoundRoll(context);
+
+                if (isWounded) {
+                    System.out.print("  -> Ранение! (Бросок: " + context.getWoundRoll() +
+                            " -> Итого: " + context.getFinalWoundRoll() + ")");
+
+                    boolean isSaved = resolveSaveRoll(context);
+
+                    if (isSaved) {
+                        System.out.println("  -> Атака отбита! (Бросок: " + context.getSaveRoll() +
+                                " -> Итого: " + context.getFinalSaveRoll() + ")");
+
+                    } else {
+                        System.out.println("  -> Урон нанесён. (Бросок: " + context.getSaveRoll() +
+                                " -> Итого: " + context.getFinalSaveRoll() + ")");
+                    }
+
+                } else {
+                    System.out.println("  -> Не пробил броню. (Бросок: " + context.getWoundRoll() +
+                            " -> Итого: " + context.getFinalWoundRoll() + ")");
+                }
+
             } else {
                 System.out.println("Промах. (Кубик: " + context.getHitRoll() +
                         " -> Итого: " + context.getFinalHitRoll() + ")");
@@ -70,6 +94,64 @@ public class CombatEngine {
     }
 
     private boolean resolveWoundRoll(AttackContext context) {
+        int strength = context.getWeapon().getStrength();
+        int toughness = context.getTarget().getDatasheet().getBaseToughness();
+        int diceRoll = DiceRoller.rollD6();
+        int targetNumber = 0;
 
+        if (strength >= toughness * 2){
+            targetNumber = 2;
+        } else if (strength > toughness) {
+            targetNumber = 3;
+        } else if (strength == toughness) {
+            targetNumber = 4;
+        } else if (strength * 2 <= toughness) {
+            targetNumber = 6;
+        } else if (strength < toughness) {
+            targetNumber = 5;
+        }
+
+        context.setWoundRoll(diceRoll);
+
+        if (diceRoll == 6) {
+            context.setCriticalWound(true);
+        }
+
+        for (Ability ability : context.getAttacker().getActiveAbilities()) {
+            ability.modifyWoundRoll(context.getAttacker(), context);
+        }
+
+        if (diceRoll == 1) {
+            return false;
+        }
+
+        if (diceRoll == 6) {
+            return true;
+        } else if (context.getFinalWoundRoll() >= targetNumber){
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean resolveSaveRoll(AttackContext context) {
+        if (context.isCriticalWound() &&
+                (context.getWeapon().getWeaponKeywords().contains(Keyword.DEVASTATING_WOUNDS))) {
+            return false;
+        }
+
+        int save = context.getTarget().getDatasheet().getBaseSave() - context.getWeapon().getAp();
+        int bestSave = Math.min(save, context.getTarget().getDatasheet().getInvulnerableSaveValue());
+        int diceRoll = DiceRoller.rollD6();
+
+        context.setSaveRoll(diceRoll);
+
+        if (diceRoll == 1) {
+            return false;
+        } else if (context.getFinalSaveRoll() >= bestSave) {
+            return true;
+        }
+
+        return false;
     }
 }

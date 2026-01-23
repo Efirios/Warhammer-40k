@@ -29,7 +29,6 @@ import ru.smiras.warhammer40k.factions.adeptuscustodes.abilities.KatahEffect;
 import java.util.*;
 
 public class UnitInstance {
-
     private final Datasheet datasheet;
     private int remainingWounds; // текущее значение W
     private int remainingModels; // оставшиеся модели (для отрядов)

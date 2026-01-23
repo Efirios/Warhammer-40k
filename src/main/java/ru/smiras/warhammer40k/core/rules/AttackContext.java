@@ -17,7 +17,6 @@ import ru.smiras.warhammer40k.core.util.PhaseType;
 import ru.smiras.warhammer40k.game.state.UnitInstance;
 
 public class AttackContext {
-
     private final UnitInstance attacker; // — атакующий юнит
     private final UnitInstance target; // — цель
     private final WeaponProfile weapon; // — оружие, которым атакуют
@@ -65,8 +64,16 @@ public class AttackContext {
         return hitRoll + hitModifier;
     }
 
+    public int getWoundRoll() {
+        return woundRoll;
+    }
+
     public int getFinalWoundRoll() {
         return woundRoll + woundModifier;
+    }
+
+    public int getSaveRoll() {
+        return saveRoll;
     }
 
     public int getFinalSaveRoll() {
@@ -82,7 +89,7 @@ public class AttackContext {
     }
 
     public void addHitModifier(int value) {
-        hitModifier = value;
+        hitModifier += value;
     }
 
     public void setCriticalHit(boolean value) {
@@ -150,5 +157,13 @@ public class AttackContext {
 
     public int getEffectiveDamage() {
         return ignoreSave ? 0 : getFinalDamageRoll();
+    }
+
+    public boolean isCriticalWound () {
+        return isCriticalWound;
+    }
+
+    public boolean isCriticalHit () {
+        return isCriticalHit;
     }
 }

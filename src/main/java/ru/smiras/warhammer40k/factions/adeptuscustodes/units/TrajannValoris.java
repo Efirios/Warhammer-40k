@@ -21,7 +21,6 @@ import ru.smiras.warhammer40k.factions.adeptuscustodes.weapons.WatchersAxe;
 import java.util.*;
 
 public class TrajannValoris extends Datasheet {
-
     private static final String NAME = "Траян Валорис";
     private static final int M = 6;
     private static final int T = 6;

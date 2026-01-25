@@ -19,67 +19,40 @@ import ru.smiras.warhammer40k.factions.adeptuscustodes.units.CustodianGuard;
 import ru.smiras.warhammer40k.factions.adeptuscustodes.units.TrajannValoris;
 import ru.smiras.warhammer40k.factions.worldeaters.units.Angron;
 import ru.smiras.warhammer40k.game.state.UnitInstance;
+import ru.smiras.warhammer40k.game.turn.TurnManager;
+
+import java.util.List;
+import java.util.Scanner;
 
 public class MainWarhammer40k {
     public static void main(String[] args) {
-        Datasheet trajannData = new TrajannValoris("Trajann");
-        Datasheet custodianGuardData1 = new CustodianGuard("Custodian Guard");
-        Datasheet angronData = new Angron("Angron");
+        Datasheet trajannValoris = new TrajannValoris("Trajann-Valoris-1");
+        Datasheet custodianGuard = new CustodianGuard("Custodian-Guard-1");
+        Datasheet angron = new Angron("Angron-1");
 
-        UnitInstance trajannUnit = new UnitInstance(trajannData);
-        UnitInstance custodianGuardUnit1 = new UnitInstance(custodianGuardData1);
-        UnitInstance angronUnit = new UnitInstance(angronData);
+        UnitInstance trajannValorisUnit = new UnitInstance(trajannValoris);
+        UnitInstance custodianGuardUnit = new UnitInstance(custodianGuard);
+        UnitInstance angronUnit = new UnitInstance(angron);
 
-        CombatEngine engine = new CombatEngine();
+        List<UnitInstance> adeptusCutodes = List.of(trajannValorisUnit, custodianGuardUnit);
+        List<UnitInstance> worldEaters = List.of(angronUnit);
 
-        // Подготовка: Выбираем стойку перед началом замеса
-        System.out.println("--- Фаза Командования: Траян выбирает стойку ---");
-        MortialKatah.create().onPhaseStart(trajannUnit, PhaseType.COMMAND_PHASE);
+        TurnManager turnManager = new TurnManager(adeptusCutodes, worldEaters);
+        CombatEngine combatEngine = new CombatEngine();
+        Scanner scanner = new Scanner(System.in);
 
-        System.out.println("--- Фаза Командования: Custodian Guard выбирают стойку ---");
-        MortialKatah.create().onPhaseStart(custodianGuardUnit1, PhaseType.COMMAND_PHASE);
+        while (trajannValorisUnit.isAlive() || angronUnit.isAlive()) {
+            System.out.println( "===== РАУНД " + turnManager.getCurrentRound() + " ======");
+            System.out.println( "===== ХОДИТ " + (turnManager.isPlayer1Turn() ? "ИГРОК 1 (Adeptus Custodes)" :
+                    "ИГРОК 2 (World Eaters)"));
 
-        int round = 1;
-
-        // БОЙ НАСМЕРТЬ
-        while (trajannUnit.isAlive() && angronUnit.isAlive()) {
-            System.out.println("\n========= РАУНД " + round + " =========");
-
-            // --- ХОД ТРАЯНА ---
-            System.out.println("\n[Траян атакует Ангрона]");
-            // Оружие: Watcher's Axe (index 1)
-            WeaponProfile axe = trajannUnit.getDatasheet().getWeapons().get(1);
-            engine.resolveAttack(trajannUnit, angronUnit, axe, PhaseType.FIGHT_PHASE);
-
-            if (!angronUnit.isAlive()) {
-                System.out.println("\n*** АНГРОН ПОВЕРЖЕН! ПОБЕДА ИМПЕРИУМА! ***");
-                break;
+            switch (turnManager.getCurrentPhase()) {
+                case COMMAND_PHASE -> System.out.println("--- COMMAND PHASE ---");
+                case MOVEMENT_PHASE -> System.out.println("--- MOVEMENT PHASE ---");
+                case SHOOTING_PHASE -> System.out.println("--- SHOOTING PHASE ---");
+                case CHARGE_PHASE -> System.out.println("--- CHARGE PHASE ---");
+                case FIGHT_PHASE ->
             }
-
-            // --- ХОД Custodian Guard ---
-            System.out.println("\n[Custodian Guard атакует Ангрона]");
-            // Оружие: Watcher's Axe (index 1)
-            WeaponProfile spear = custodianGuardUnit1.getDatasheet().getWeapons().get(1);
-            engine.resolveAttack(custodianGuardUnit1, angronUnit, spear, PhaseType.FIGHT_PHASE);
-
-            if (!angronUnit.isAlive()) {
-                System.out.println("\n*** АНГРОН ПОВЕРЖЕН! ПОБЕДА ИМПЕРИУМА! ***");
-                break;
-            }
-
-            // --- ХОД АНГРОНА ---
-            System.out.println("\n[Ангрон атакует Траяна]");
-            // Оружие: Samniarius Strike (index 0) - бьем профилем Strike (сильным)
-            WeaponProfile strike = angronUnit.getDatasheet().getWeapons().get(0);
-
-            engine.resolveAttack(angronUnit, trajannUnit, strike, PhaseType.FIGHT_PHASE);
-
-            if (!trajannUnit.isAlive()) {
-                System.out.println("\n*** ТРАЯН ПАЛ! ЧЕРЕПА ДЛЯ ТРОНА ЧЕРЕПОВ! ***");
-                break;
-            }
-
-            round++;
         }
     }
 }

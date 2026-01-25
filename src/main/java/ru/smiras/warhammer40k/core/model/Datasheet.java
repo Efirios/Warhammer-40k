@@ -102,6 +102,7 @@ public class Datasheet {
         if (pointsValues < 0) {
             throw new IllegalArgumentException("Points Values не может быть меньше 0!");
         }
+
         this.baseModelCount = baseModelCount;
 
         this.pointsValues = pointsValues;

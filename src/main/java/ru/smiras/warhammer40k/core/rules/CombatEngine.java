@@ -29,7 +29,9 @@ public class CombatEngine {
     public void resolveAttack(UnitInstance attacker, UnitInstance target, WeaponProfile weapon, PhaseType phase) {
         System.out.println("\n--- Атака: " + weapon.getName() + " ---");
 
-        for (int i = 0; i < weapon.getAttacks(); i++) {
+        int totalAttacks = weapon.getAttacks() * attacker.getRemainingModels();
+
+        for (int i = 0; i < totalAttacks; i++) {
             AttackContext context = new AttackContext(attacker, target, weapon, phase);
 
             boolean isHit = resolveHitRoll(context);

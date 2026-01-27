@@ -1,47 +1,56 @@
-# Warhammer 40k Simulator v. 0.0.1
+# Warhammer 40,000 Simulator (Java Edition)
 
-Компьютерная симуляция настольной игры Warhammer 40,000 (10-я редакция) на Java.
+Цифровой симулятор настольной игры Warhammer 40,000 (10-я редакция).
+Проект реализует ядро правил (Core Rules), последовательность хода и механику боя в консольном режиме с архитектурой, готовой к подключению графического интерфейса (LibGDX).
 
-Цель проекта — создать точную цифровую модель настольной игры, реализовав все правила Core Rules 10th Edition (фазы, последовательность атаки, ключевые слова, спецправила), с возможностью дальнейшей визуализации на LibGDX.
+## 🚀 Текущий статус: Рабочий прототип (v0.2)
 
-## Текущий статус
-Проект находится в стадии активной разработки ядра правил (Core Rules Engine).
-Реализована архитектура "Stateless Logic + Stateful Entities".
+Реализован полный игровой цикл (Game Loop) и математическая модель боя. Два игрока (Adeptus Custodes и World Eaters) могут сражаться в автоматизированном режиме с логами событий.
 
-### Реализовано:
-- **Модель данных (Model):**
-    - `Datasheet`: Неизменяемые шаблоны юнитов из Кодекса (характеристики, кейворды).
-    - `WeaponProfile`: Профили оружия (Melee/Ranged, S, AP, D, Keywords).
-    - `UnitInstance`: Живые экземпляры юнитов на столе (учет ран, моделей, OC, Battle-shock).
-- **Система правил (Core Rules):**
-    - `CombatEngine`: Центральный движок, реализующий Attack Sequence (Hit Roll -> Wound Roll...).
-    - `AttackContext`: Контейнер данных для передачи состояния сквозь этапы атаки.
-    - Механика **Hit Roll** с учетом модификаторов, Critical Hits (Natural 6) и Auto-fails (Natural 1).
-- **Способности (Abilities):**
-    - Гибкая система способностей через интерфейс `Ability`.
-    - Реализованы механики:
-        - *Martial Ka'tah* (Adeptus Custodes) — выбор стойки в Command Phase.
-        - *Deep Strike* — правило резервов.
-        - *Feel No Pain 5+* — игнорирование урона.
-- **Фракции:**
-    - Базовая реализация **Adeptus Custodes** (Trajann Valoris, Custodian Guard).
-    - Базовая реализация **World Eaters** (Angron).
+### ✅ Реализованные механики (Core Rules)
+*   **Структура хода:**
+    *   Автоматический менеджер хода (`TurnManager`).
+    *   Смена фаз: Command -> Movement -> Shooting -> Charge -> Fight.
+    *   Roll-off (бросок кубиков) за первый ход.
+    *   Счетчик раундов и определение активного игрока.
+*   **Боевая система (`CombatEngine`):**
+    *   Полная последовательность атаки: **Hit Roll → Wound Roll → Save Roll → Damage**.
+    *   **Hit Roll:** Учет BS/WS, модификаторов, Critical Hits (Natural 6) и промахов (Natural 1).
+    *   **Wound Roll:** Таблица S vs T (2+, 3+, 4+, 5+, 6+), Critical Wounds.
+    *   **Save Roll:** Выбор лучшего спасброска (Armor Save + AP vs Invulnerable Save).
+    *   **Damage:** Переменный урон (D3, D6+X), распределение урона по моделям.
+*   **Специальные правила (Keywords & Abilities):**
+    *   **Devastating Wounds:** Игнорирование спасбросков при критическом ранении.
+    *   **Feel No Pain 5+:** Способность игнорировать полученный урон.
+    *   **Deep Strike:** Механика резервов (база).
+*   **Фракционные способности:**
+    *   **Martial Ka'tah (Adeptus Custodes):** Выбор боевой стойки (+1 Hit, +1 Wound или +1 Damage) в начале фазы.
 
-## Архитектура
-Проект использует строгую типизацию и разделение ответственности:
-- **State:** Состояние юнитов хранится в `UnitInstance`.
-- **Logic:** Правила и способности (`CombatEngine`, `Ability`) не хранят состояние (Stateless), а модифицируют переданный контекст.
-- **Dice:** Утилитарный класс `DiceRoller` для симуляции D3, D6, 2D6.
+### 💂 Реализованные Юниты
+*   **Adeptus Custodes:**
+    *   Trajann Valoris (Watcher's Axe, Eagle's Scream).
+    *   Custodian Guard (Guardian Spear, Sentinel Blade, Misericordia).
+*   **World Eaters:**
+    *   Angron, Daemon Primarch (Samniarius & Spinegrinder - Strike/Sweep profiles).
 
-## Требования
-- Java 21+
-- IntelliJ IDEA (рекомендуется)
+## 🛠 Архитектура проекта
+Проект построен на принципах ООП с четким разделением ответственности:
+*   **Model:** `Datasheet`, `WeaponProfile` — неизменяемые данные (Stateless).
+*   **State:** `UnitInstance` — живое состояние юнита (раны, модели, эффекты).
+*   **Logic:** `CombatEngine`, `TurnManager` — чистая логика правил.
+*   **Interfaces:** Система `Ability` позволяет легко добавлять новые правила без изменения движка.
 
-## Планы (Roadmap)
-- [x] Базовая структура юнитов и оружия
-- [x] Движок боя: Этап попадания (Hit Roll)
-- [ ] Движок боя: Этап ранения (Wound Roll)
-- [ ] Движок боя: Спасброски (Save Roll) и AP
-- [ ] Движок боя: Распределение урона (Allocation & Damage)
-- [ ] Реализация фаз игры (Command, Movement, Shooting, Fight)
-- [ ] Графический интерфейс (LibGDX) 2.5D
+## 📋 Требования
+*   Java 21+ (используются современные возможности switch/case и records).
+*   Консоль (для текущего вывода логов боя).
+
+## 🔮 Планы (Roadmap)
+*   [x] Ядро боевой системы (Melee).
+*   [x] Менеджер хода и фаз.
+*   [ ] Реализация логики стрельбы (Shooting Phase).
+*   [ ] Реализация движения и дистанций (Movement/Charge).
+*   [ ] Подключение графической библиотеки **LibGDX** (2.5D визуализация).
+*   [ ] Расширение списка юнитов и фракций.
+
+---
+*Автор: [Твое Имя/Ник]*

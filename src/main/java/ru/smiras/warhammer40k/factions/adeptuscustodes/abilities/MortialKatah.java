@@ -50,7 +50,7 @@ public class MortialKatah implements Ability {
     @Override
     public void onPhaseStart(UnitInstance unit, PhaseType phase){
 
-        if (!unit.isAlive() || phase != PhaseType.COMMAND_PHASE) {
+        if (!unit.isAlive() || phase != PhaseType.FIGHT_PHASE) {
             return;
         }
 
@@ -84,6 +84,13 @@ public class MortialKatah implements Ability {
             } catch (NumberFormatException e) {
                 System.out.println("Неверный ввод! Введите число 1, 2 или 3.");
             }
+        }
+    }
+
+    @Override
+    public void onPhaseEnd(UnitInstance unit, PhaseType phase) {
+        if (phase == PhaseType.FIGHT_PHASE) {
+            unit.setCurrentMortialKatahEffect(KatahEffect.NONE);
         }
     }
 

@@ -32,6 +32,11 @@ public class CombatEngine {
         int totalAttacks = weapon.getAttacks() * attacker.getRemainingModels();
 
         for (int i = 0; i < totalAttacks; i++) {
+            if (!target.isAlive()) {
+                System.out.println("   [Цель уничтожена. Остальные атаки отменены]");
+                break;
+            }
+
             AttackContext context = new AttackContext(attacker, target, weapon, phase);
 
             boolean isHit = resolveHitRoll(context);

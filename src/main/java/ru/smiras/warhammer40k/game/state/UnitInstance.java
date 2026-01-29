@@ -24,6 +24,7 @@
 package ru.smiras.warhammer40k.game.state;
 
 import ru.smiras.warhammer40k.core.model.*;
+import ru.smiras.warhammer40k.core.util.Coordinates;
 import ru.smiras.warhammer40k.factions.adeptuscustodes.abilities.KatahEffect;
 
 import java.util.*;
@@ -41,6 +42,7 @@ public class UnitInstance {
     private List<Ability> activeAbilities; // активные способности (копия из datasheet)
 
     private KatahEffect currentMortialKatahEffect; //текущее состояние Martial Ka'tah (enum)
+    private Coordinates position;
 
     public UnitInstance(Datasheet datasheet){
         this.datasheet = datasheet;
@@ -57,6 +59,8 @@ public class UnitInstance {
         isBattleShoked = false;
         isActivatedThisPhase = false;
         currentOC = recalculateOC();
+
+        this.position = new Coordinates(0, 0);
     }
 
     public Datasheet getDatasheet() {
@@ -97,6 +101,14 @@ public class UnitInstance {
 
     public KatahEffect getCurrentMortialKatahEffect() {
         return currentMortialKatahEffect;
+    }
+
+    public Coordinates getPosition() {
+        return position;
+    }
+
+    public void setPosition(Coordinates position) {
+        this.position = position;
     }
 
     public void setCurrentMortialKatahEffect(KatahEffect katahEffect) {

@@ -82,16 +82,15 @@ public class MortialKatah implements Ability {
     @Override
     public void modifyHitRoll(UnitInstance unit, AttackContext context) {
         if (unit.getCurrentMortialKatahEffect() == KatahEffect.DACATARAI &&
-                context.getWeapon().getType() == WeaponType.MELEE) {
-            context.addHitModifier(1);
+                context.getWeapon().getType() == WeaponType.MELEE &&
+                context.isCriticalHit()) {
+            context.addExtraHits(1);
         }
-    }
 
-    @Override
-    public void modifyWoundRoll(UnitInstance unit, AttackContext context) {
         if (unit.getCurrentMortialKatahEffect() == KatahEffect.RENDAX &&
-                context.getWeapon().getType() == WeaponType.MELEE) {
-            context.addWoundModifier(1);
+                context.getWeapon().getType() == WeaponType.MELEE &&
+                context.isCriticalHit()) {
+            context.setAutoWound(true);
         }
     }
 

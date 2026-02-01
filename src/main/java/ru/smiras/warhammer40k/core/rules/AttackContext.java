@@ -32,6 +32,8 @@ public class AttackContext {
     private boolean ignoreSave = false; // — игнорировать спасбросок (Devastating Wounds)
     private int damageRoll = 0;
     private int damageModifier = 0;
+    private int extraHits = 0;
+    private boolean autoWound = false;
 
     public AttackContext(UnitInstance attacker, UnitInstance target, WeaponProfile weapon, PhaseType phase) {
         this.attacker = attacker;
@@ -86,6 +88,22 @@ public class AttackContext {
 
     public boolean getIgnoreSave() {
         return ignoreSave;
+    }
+
+    public boolean getAutoWound() {
+        return autoWound;
+    }
+
+    public int getExtraHits() {
+        return extraHits;
+    }
+
+    public void addExtraHits(int value) {
+        extraHits += value;
+    }
+
+    public void setAutoWound(boolean value) {
+        autoWound = value;
     }
 
     public void setHitRoll(int value) {
@@ -153,17 +171,19 @@ public class AttackContext {
         isCriticalHit = false;
         isCriticalWound = false;
         ignoreSave = false;
+        extraHits = 0;
+        autoWound = false;
     }
 
     public void setFinalHitRoll(int value) {
         hitRoll = value - hitModifier;
     }
 
-    public boolean isCriticalWound () {
+    public boolean isCriticalWound() {
         return isCriticalWound;
     }
 
-    public boolean isCriticalHit () {
+    public boolean isCriticalHit() {
         return isCriticalHit;
     }
 }

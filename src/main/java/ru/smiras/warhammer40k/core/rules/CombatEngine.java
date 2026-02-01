@@ -31,7 +31,6 @@ public class CombatEngine {
 
         int totalAttacks = weapon.getAttacks() * attacker.getRemainingModels();
 
-        // Контекст для событий "выбран драться" / "закончил драться"
         AttackContext fightContext = new AttackContext(attacker, target, weapon, phase);
 
         // Сообщаем способностям атакующего, что он выбран для боя
@@ -56,8 +55,13 @@ public class CombatEngine {
                 boolean isWounded = resolveWoundRoll(context);
 
                 if (isWounded) {
-                    System.out.print("-> Ранение (Бросок: " + context.getWoundRoll() +
-                            " -> Итого: " + context.getFinalWoundRoll() + ") ");
+
+                    if (context.getAutoWound()) {
+                        System.out.print("Авто‑ранение (Lethal Hits)");
+                    } else {
+                        System.out.print("-> Ранение (Бросок: " + context.getWoundRoll() +
+                                " -> Итого: " + context.getFinalWoundRoll() + ") ");
+                    }
 
                     boolean isDevastating = context.isCriticalWound() &&
                             context.getWeapon().getWeaponKeywords().contains(Keyword.DEVASTATING_WOUNDS);
@@ -93,6 +97,60 @@ public class CombatEngine {
 
                 } else {
                     System.out.println("-> Не пробил (Бросок: " + context.getWoundRoll() + ")");
+                }
+
+                if (context.getExtraHits() > 0) {
+                    for (int j = 0; j < context.getExtraHits(); j++) {
+                        AttackContext newContext = new AttackContext(attacker, target, weapon, phase);
+
+                        System.out.print("Дополнительное попадание (Sustained Hits)");
+
+                        boolean isNewWounded = resolveWoundRoll(newContext);
+
+                        if (isNewWounded) {
+                            if (newContext.getAutoWound()) {
+                                System.out.print("Авто‑ранение (Lethal Hits)");
+                            } else {
+                                System.out.print("-> Ранение (Бросок: " + newContext.getWoundRoll() +
+                                        " -> Итого: " + newContext.getFinalWoundRoll() + ") ");
+                            }
+
+                            boolean isDevastating = newContext.isCriticalWound() &&
+                                    newContext.getWeapon().getWeaponKeywords().contains(Keyword.DEVASTATING_WOUNDS);
+
+                            int lostModels = 0;
+                            boolean damageWasDealt = false;
+
+                            if (isDevastating) {
+                                System.out.println("-> DEVASTATING WOUNDS! (Спасброски игнорируются)");
+                                newContext.setIgnoreSave(true);
+                            }
+
+                            boolean isSaved = resolveSaveRoll(newContext);
+
+                            if (isSaved) {
+                                System.out.println("-> ОТБИТО (Бросок: " + newContext.getSaveRoll() +
+                                        " -> Итого: " + newContext.getFinalSaveRoll() + ")");
+                            } else {
+                                System.out.println("-> Провал сейва (Бросок: " + newContext.getSaveRoll() +
+                                        " -> Итого: " + newContext.getFinalSaveRoll() + ")");
+                                lostModels = resolveDamage(newContext);
+                                damageWasDealt = true;
+                            }
+
+                            if (damageWasDealt) {
+                                if (lostModels > 0) {
+                                    System.out.println("      !!! МОДЕЛЬ УНИЧТОЖЕНА !!!");
+                                }
+
+                                System.out.println("      [Цель: " + newContext.getTarget().getRemainingModels() +
+                                        " моделей, " + newContext.getTarget().getRemainingWounds() + " Wounds]");
+                            }
+
+                        } else {
+                            System.out.println("-> Не пробил (Бросок: " + newContext.getWoundRoll() + ")");
+                        }
+                    }
                 }
 
             } else {
@@ -133,41 +191,45 @@ public class CombatEngine {
     }
 
     private boolean resolveWoundRoll(AttackContext context) {
-        int strength = context.getWeapon().getStrength();
-        int toughness = context.getTarget().getDatasheet().getBaseToughness();
-        int diceRoll = DiceRoller.rollD6();
-        int targetNumber = 0;
-
-        if (strength >= toughness * 2){
-            targetNumber = 2;
-        } else if (strength > toughness) {
-            targetNumber = 3;
-        } else if (strength == toughness) {
-            targetNumber = 4;
-        } else if (strength * 2 <= toughness) {
-            targetNumber = 6;
-        } else if (strength < toughness) {
-            targetNumber = 5;
-        }
-
-        context.setWoundRoll(diceRoll);
-
-        if (diceRoll == 6) {
-            context.setCriticalWound(true);
-        }
-
-        for (Ability ability : context.getAttacker().getActiveAbilities()) {
-            ability.modifyWoundRoll(context.getAttacker(), context);
-        }
-
-        if (diceRoll == 1) {
-            return false;
-        }
-
-        if (diceRoll == 6) {
+        if (context.getAutoWound()) {
             return true;
-        } else if (context.getFinalWoundRoll() >= targetNumber){
-            return true;
+        } else {
+            int strength = context.getWeapon().getStrength();
+            int toughness = context.getTarget().getDatasheet().getBaseToughness();
+            int diceRoll = DiceRoller.rollD6();
+            int targetNumber = 0;
+
+            if (strength >= toughness * 2){
+                targetNumber = 2;
+            } else if (strength > toughness) {
+                targetNumber = 3;
+            } else if (strength == toughness) {
+                targetNumber = 4;
+            } else if (strength * 2 <= toughness) {
+                targetNumber = 6;
+            } else if (strength < toughness) {
+                targetNumber = 5;
+            }
+
+            context.setWoundRoll(diceRoll);
+
+            if (diceRoll == 6) {
+                context.setCriticalWound(true);
+            }
+
+            for (Ability ability : context.getAttacker().getActiveAbilities()) {
+                ability.modifyWoundRoll(context.getAttacker(), context);
+            }
+
+            if (diceRoll == 1) {
+                return false;
+            }
+
+            if (diceRoll == 6) {
+                return true;
+            } else if (context.getFinalWoundRoll() >= targetNumber){
+                return true;
+            }
         }
 
         return false;

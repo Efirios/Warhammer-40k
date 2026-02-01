@@ -84,6 +84,10 @@ public class AttackContext {
         return damageRoll + damageModifier;
     }
 
+    public boolean getIgnoreSave() {
+        return ignoreSave;
+    }
+
     public void setHitRoll(int value) {
         hitRoll = value;
     }
@@ -153,10 +157,6 @@ public class AttackContext {
 
     public void setFinalHitRoll(int value) {
         hitRoll = value - hitModifier;
-    }
-
-    public int getEffectiveDamage() {
-        return ignoreSave ? 0 : getFinalDamageRoll();
     }
 
     public boolean isCriticalWound () {

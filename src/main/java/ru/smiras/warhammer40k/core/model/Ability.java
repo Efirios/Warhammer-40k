@@ -13,9 +13,9 @@
 
 package ru.smiras.warhammer40k.core.model;
 
-import ru.smiras.warhammer40k.core.rules.*;
-import ru.smiras.warhammer40k.core.util.*;
-import ru.smiras.warhammer40k.game.state.*;
+import ru.smiras.warhammer40k.core.rules.AttackContext;
+import ru.smiras.warhammer40k.core.util.PhaseType;
+import ru.smiras.warhammer40k.game.state.UnitInstance;
 
 public interface Ability {
 
@@ -41,55 +41,41 @@ public interface Ability {
         return UNLIMITED;
     }
 
-    default void modifyHitRoll(UnitInstance unit, AttackContext context) {
+    // --- Броски ---
 
-    }
+    default void modifyHitRoll(UnitInstance unit, AttackContext context) {}
 
-    default void modifyWoundRoll(UnitInstance unit, AttackContext context) {
+    default void modifyWoundRoll(UnitInstance unit, AttackContext context) {}
 
-    }
+    default void modifySaveRoll(UnitInstance unit, AttackContext context) {}
 
-    default void modifySaveRoll(UnitInstance unit, AttackContext context) {
+    default void modifyDamageRoll(UnitInstance unit, AttackContext context) {}
 
-    }
+    // --- Криты ---
 
-    default void modifyDamageRoll(UnitInstance unit, AttackContext context) {
+    default void onCriticalHit(UnitInstance unit, AttackContext context) {}
 
-    }
+    default void onCriticalWound(UnitInstance unit, AttackContext context) {}
 
-    default void onCriticalHit(UnitInstance unit, AttackContext context) {
+    // --- Фазы ---
 
-    }
+    default void onPhaseStart(UnitInstance unit, PhaseType phase) {}
 
-    default void onCriticalWound(UnitInstance unit, AttackContext context) {
+    default void onPhaseEnd(UnitInstance unit, PhaseType phase) {}
 
-    }
+    // --- После этапов ---
 
-    default void onPhaseStart(UnitInstance unit, PhaseType phase){
+    default void applyAfterHitRoll(UnitInstance unit, AttackContext context) {}
 
-    }
+    default void applyAfterWoundRoll(UnitInstance unit, AttackContext context) {}
 
-    default void onPhaseEnd(UnitInstance unit, PhaseType phase){
+    default void applyAfterSaveRoll(UnitInstance unit, AttackContext context) {}
 
-    }
+    default void applyAfterDamageAllocated(UnitInstance unit, AttackContext context) {}
 
-    default void applyAfterHitRoll(UnitInstance unit, AttackContext context){
+    default void applyReaction(UnitInstance unit, AttackContext context) {}
 
-    }
+    default void onFightSelected(UnitInstance unit, AttackContext context) {}
 
-    default void applyAfterWoundRoll(UnitInstance unit, AttackContext context) {
-
-    }
-
-    default void applyAfterSaveRoll(UnitInstance unit, AttackContext context){
-
-    }
-
-    default void applyAfterDamageAllocated(UnitInstance unit, AttackContext context){
-
-    }
-
-    default void applyReaction(UnitInstance unit, AttackContext context){
-
-    }
+    default void onFightFinished(UnitInstance unit, AttackContext context) {}
 }

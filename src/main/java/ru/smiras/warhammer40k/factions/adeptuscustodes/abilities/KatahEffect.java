@@ -21,6 +21,5 @@ package ru.smiras.warhammer40k.factions.adeptuscustodes.abilities;
 public enum KatahEffect {
     NONE,
     DACATARAI,
-    KAPTARIS,
-    CALISTUS
+    RENDAX
 }

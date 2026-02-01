@@ -25,6 +25,8 @@ public class DiceRoller {
     }
 
     public static int roll2D6() {
-        return (RANDOM.nextInt(6) + 1) * 2;
+        int roll1 = (RANDOM.nextInt(6) + 1);
+        int roll2 = (RANDOM.nextInt(6) + 1);
+        return roll1 + roll2;
     }
 }

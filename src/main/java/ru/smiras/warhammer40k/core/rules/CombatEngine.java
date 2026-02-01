@@ -31,6 +31,14 @@ public class CombatEngine {
 
         int totalAttacks = weapon.getAttacks() * attacker.getRemainingModels();
 
+        // Контекст для событий "выбран драться" / "закончил драться"
+        AttackContext fightContext = new AttackContext(attacker, target, weapon, phase);
+
+        // Сообщаем способностям атакующего, что он выбран для боя
+        for (Ability ability : attacker.getActiveAbilities()) {
+            ability.onFightSelected(attacker, fightContext);
+        }
+
         for (int i = 0; i < totalAttacks; i++) {
             if (!target.isAlive()) {
                 System.out.println("   [Цель уничтожена. Остальные атаки отменены]");
@@ -59,20 +67,19 @@ public class CombatEngine {
 
                     if (isDevastating) {
                         System.out.println("-> DEVASTATING WOUNDS! (Спасброски игнорируются)");
+                        context.setIgnoreSave(true);
+                    }
+
+                    boolean isSaved = resolveSaveRoll(context);
+
+                    if (isSaved) {
+                        System.out.println("-> ОТБИТО (Бросок: " + context.getSaveRoll() +
+                                " -> Итого: " + context.getFinalSaveRoll() + ")");
+                    } else {
+                        System.out.println("-> Провал сейва (Бросок: " + context.getSaveRoll() +
+                                " -> Итого: " + context.getFinalSaveRoll() + ")");
                         lostModels = resolveDamage(context);
                         damageWasDealt = true;
-                    } else {
-                        boolean isSaved = resolveSaveRoll(context);
-
-                        if (isSaved) {
-                            System.out.println("-> ОТБИТО (Бросок: " + context.getSaveRoll() +
-                                    " -> Итого: " + context.getFinalSaveRoll() + ")");
-                        } else {
-                            System.out.println("-> Провал сейва (Бросок: " + context.getSaveRoll() +
-                                    " -> Итого: " + context.getFinalSaveRoll() + ")");
-                            lostModels = resolveDamage(context);
-                            damageWasDealt = true;
-                        }
                     }
 
                     if (damageWasDealt) {
@@ -91,6 +98,11 @@ public class CombatEngine {
             } else {
                 System.out.println("Промах (Кубик: " + context.getHitRoll() + ")");
             }
+        }
+
+        // Сообщаем способностям, что юнит закончил свои атаки
+        for (Ability ability : attacker.getActiveAbilities()) {
+            ability.onFightFinished(attacker, fightContext);
         }
     }
 
@@ -162,8 +174,7 @@ public class CombatEngine {
     }
 
     private boolean resolveSaveRoll(AttackContext context) {
-        if (context.isCriticalWound() &&
-                (context.getWeapon().getWeaponKeywords().contains(Keyword.DEVASTATING_WOUNDS))) {
+        if (context.getIgnoreSave()) {
             return false;
         }
 

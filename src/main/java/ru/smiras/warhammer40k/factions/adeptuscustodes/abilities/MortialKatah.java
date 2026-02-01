@@ -1,16 +1,3 @@
-/**
- * Фракционная способность Adeptus Custodes — Martial Ka'tah из кодекса Adeptus Custodes
- * (10-я редакция Warhammer 40,000).
- *
- * Реализует правила Martial Ka'tah: в начале Command phase игрок выбирает один эффект
- * (Dacatarai — +1 to hit, Kaptaris — +1 to wound, Calistus — +1 to damage) для юнита
- * в ближнем бою до следующей Command phase.
- *
- * Выбор происходит в методе onPhaseStart (консольный ввод для прототипа).
- * Эффект применяется в modifyHitRoll / modifyWoundRoll / modifyDamageRoll.
- * Сбрасывается в onPhaseEnd или перед новым выбором.
- */
-
 package ru.smiras.warhammer40k.factions.adeptuscustodes.abilities;
 
 import ru.smiras.warhammer40k.core.model.Ability;
@@ -25,12 +12,9 @@ import java.util.Scanner;
 public class MortialKatah implements Ability {
 
     private static final Scanner SCANNER = new Scanner(System.in);
-
     private static final MortialKatah INSTANCE = new MortialKatah();
 
-    private MortialKatah(){
-
-    }
+    private MortialKatah() {}
 
     public static MortialKatah create() {
         return INSTANCE;
@@ -38,89 +22,77 @@ public class MortialKatah implements Ability {
 
     @Override
     public String getName() {
-        return "Mortial Ka`tah";
+        return "Martial Ka'tah";
     }
 
     @Override
     public String getDescription() {
-        return "В начале Command phase выбирайте эффект: +1 to hit, +1 to wound или +1 to damage в ближнем бою до" +
-                " следующей Command phase.";
+        return "Каждый раз, когда юнит выбирается для боя, выберите одну из стоек: " +
+                "Dacatarai (Sustained Hits 1 в ближнем бою) или Rendax (Lethal Hits в ближнем бою). " +
+                "Эффект действует, пока юнит выполняет свои атаки.";
     }
 
-    @Override
-    public void onPhaseStart(UnitInstance unit, PhaseType phase){
-
-        if (!unit.isAlive() || phase != PhaseType.FIGHT_PHASE) {
+    public void selectStanceForFight(UnitInstance unit) {
+        if (!unit.isAlive()) {
             return;
         }
 
-        unit.setCurrentMortialKatahEffect(KatahEffect.NONE);
-
         while (true) {
-            System.out.println("Выберите эффект Mortial Ka'tah:" +
-                    "\n1 - +1 to Hit (Dacatarai)" +
-                    "\n2 - +1 to Wound (Kaptaris)" +
-                    "\n3 - +1 to Damage (Calistus)");
+            System.out.println("Выберите стойку Martial Ka'tah для юнита " +
+                    unit.getDatasheet().getBaseName() + ":" +
+                    "\n1 - Dacatarai (Sustained Hits 1 (доп. попадания при крите), ближний бой)" +
+                    "\n2 - Rendax (Lethal Hits (авто‑ранение при крите), ближний бой)");
 
             String input = SCANNER.nextLine().trim();
             try {
                 int choice = Integer.parseInt(input);
 
-                if (choice >= 1 && choice <= 3) {
-                    if (choice == 1) {
-                        unit.setCurrentMortialKatahEffect(KatahEffect.DACATARAI);
-                        System.out.println("Выбран эффект: Dacatarai (+1 to Hit)");
-                    } else if (choice == 2) {
-                        unit.setCurrentMortialKatahEffect(KatahEffect.KAPTARIS);
-                        System.out.println("Выбран эффект: Kaptaris (+1 to Wound)");
-                    } else if (choice == 3) {
-                        unit.setCurrentMortialKatahEffect(KatahEffect.CALISTUS);
-                        System.out.println("Выбран эффект: Calistus (+1 to Damage)");
-                    }
+                if (choice == 1) {
+                    unit.setCurrentMortialKatahEffect(KatahEffect.DACATARAI);
+                    System.out.println("Выбрана стойка: Dacatarai (Sustained Hits 1 (доп. попадания при крите)).");
+                    break;
+                } else if (choice == 2) {
+                    unit.setCurrentMortialKatahEffect(KatahEffect.RENDAX);
+                    System.out.println("Выбрана стойка: Rendax (Lethal Hits (авто‑ранение при крите)).");
                     break;
                 } else {
-                    System.out.println("Неверный выбор! Введите 1, 2 или 3.");
+                    System.out.println("Неверный выбор! Введите 1 или 2.");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Неверный ввод! Введите число 1, 2 или 3.");
+                System.out.println("Неверный ввод! Введите число 1 или 2.");
             }
         }
     }
 
     @Override
-    public void onPhaseEnd(UnitInstance unit, PhaseType phase) {
-        if (phase == PhaseType.FIGHT_PHASE) {
-            unit.setCurrentMortialKatahEffect(KatahEffect.NONE);
-        }
+    public void onFightSelected(UnitInstance unit, AttackContext context) {
+        if (!unit.isAlive()) return;
+        if (context.getPhase() != PhaseType.FIGHT_PHASE) return;
+        if (context.getWeapon().getType() != WeaponType.MELEE) return;
+
+        // Каждый раз, когда юнит выбирается для боя, выбираем стойку
+        selectStanceForFight(unit);
+    }
+
+    @Override
+    public void onFightFinished(UnitInstance unit, AttackContext context) {
+        unit.setCurrentMortialKatahEffect(KatahEffect.NONE);
     }
 
     @Override
     public void modifyHitRoll(UnitInstance unit, AttackContext context) {
-        if ((unit.getCurrentMortialKatahEffect() == KatahEffect.DACATARAI) &&
-                (context.getWeapon().getType() == WeaponType.MELEE)) {
+        if (unit.getCurrentMortialKatahEffect() == KatahEffect.DACATARAI &&
+                context.getWeapon().getType() == WeaponType.MELEE) {
             context.addHitModifier(1);
         }
     }
 
     @Override
     public void modifyWoundRoll(UnitInstance unit, AttackContext context) {
-        if ((unit.getCurrentMortialKatahEffect() == KatahEffect.KAPTARIS) &&
-                (context.getWeapon().getType() == WeaponType.MELEE)) {
+        if (unit.getCurrentMortialKatahEffect() == KatahEffect.RENDAX &&
+                context.getWeapon().getType() == WeaponType.MELEE) {
             context.addWoundModifier(1);
         }
-    }
-
-    @Override
-    public void modifyDamageRoll(UnitInstance unit, AttackContext context) {
-        if ((unit.getCurrentMortialKatahEffect() == KatahEffect.CALISTUS) &&
-        (context.getWeapon().getType() == WeaponType.MELEE)) {
-            context.addDamageModifier(1);
-        }
-    }
-
-    public boolean isActive(UnitInstance unit, PhaseType currentPhase) {
-        return unit.isAlive() && (currentPhase == PhaseType.COMMAND_PHASE || unit.getCurrentMortialKatahEffect() !=
-                KatahEffect.NONE);
     }
 
     @Override
@@ -132,14 +104,12 @@ public class MortialKatah implements Ability {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MortialKatah mortialKatah = (MortialKatah) o;
-        return getName().equals(mortialKatah.getName());
+        MortialKatah that = (MortialKatah) o;
+        return getName().equals(that.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-                getName());
+        return Objects.hash(getName());
     }
 }
-

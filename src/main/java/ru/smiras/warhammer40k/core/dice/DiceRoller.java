@@ -13,20 +13,25 @@ package ru.smiras.warhammer40k.core.dice;
 import java.util.Random;
 
 public class DiceRoller {
+    static final Random RANDOM = new Random();
 
-    private static final Random RANDOM = new Random();
+    public static int roll(int diceCount, int diceType) {
+        if (diceCount < 1) {
+            throw new IllegalArgumentException(
+                    "diceCount должен быть больше 0");
+        }
 
-    public static int rollD6() {
-        return RANDOM.nextInt(6) + 1;
-    }
+        if (diceType != 3 && diceType != 6) {
+            throw new IllegalArgumentException(
+                    "diceType должен быть 3 или 6");
+        }
 
-    public static int rollD3() {
-        return RANDOM.nextInt(3) + 1;
-    }
+        int summ = 0;
+        for (int i = 0; i < diceCount; i++) {
+            int random = RANDOM.nextInt(diceType) + 1;
+            summ += random;
+        }
 
-    public static int roll2D6() {
-        int roll1 = (RANDOM.nextInt(6) + 1);
-        int roll2 = (RANDOM.nextInt(6) + 1);
-        return roll1 + roll2;
+        return summ;
     }
 }

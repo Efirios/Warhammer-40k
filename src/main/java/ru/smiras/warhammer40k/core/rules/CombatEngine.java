@@ -11,6 +11,11 @@
  * 3. Save Roll (Спасбросок) — выбор лучшего спасброска (Sv/Invul), учет AP.
  * 4. Damage Allocation (Урон) — применение урона, Feel No Pain и удаление моделей.
  *
+ * Класс обрабатывает дополнительные попадания (Sustained Hits / Dacatarai);
+ * Поддерживает авто‑ранение (Lethal Hits / Rendax) через autoWound;
+ * Перед началом и после окончания атак юнита вызывает onFightSelected / onFightFinished у способностей
+ * (для таких вещей как Martial Ka’tah).
+ *
  * Класс является "оркестратором": он создает AttackContext и прогоняет его через
  * все этапы, вызывая соответствующие методы проверки и модификации.
  */
@@ -52,104 +57,20 @@ public class CombatEngine {
                 System.out.print("Попадание (Кубик: " + context.getHitRoll() +
                         " -> Итого: " + context.getFinalHitRoll() + ") ");
 
-                boolean isWounded = resolveWoundRoll(context);
-
-                if (isWounded) {
-
-                    if (context.getAutoWound()) {
-                        System.out.print("Авто‑ранение (Lethal Hits)");
-                    } else {
-                        System.out.print("-> Ранение (Бросок: " + context.getWoundRoll() +
-                                " -> Итого: " + context.getFinalWoundRoll() + ") ");
-                    }
-
-                    boolean isDevastating = context.isCriticalWound() &&
-                            context.getWeapon().getWeaponKeywords().contains(Keyword.DEVASTATING_WOUNDS);
-
-                    int lostModels = 0;
-                    boolean damageWasDealt = false;
-
-                    if (isDevastating) {
-                        System.out.println("-> DEVASTATING WOUNDS! (Спасброски игнорируются)");
-                        context.setIgnoreSave(true);
-                    }
-
-                    boolean isSaved = resolveSaveRoll(context);
-
-                    if (isSaved) {
-                        System.out.println("-> ОТБИТО (Бросок: " + context.getSaveRoll() +
-                                " -> Итого: " + context.getFinalSaveRoll() + ")");
-                    } else {
-                        System.out.println("-> Провал сейва (Бросок: " + context.getSaveRoll() +
-                                " -> Итого: " + context.getFinalSaveRoll() + ")");
-                        lostModels = resolveDamage(context);
-                        damageWasDealt = true;
-                    }
-
-                    if (damageWasDealt) {
-                        if (lostModels > 0) {
-                            System.out.println("      !!! МОДЕЛЬ УНИЧТОЖЕНА !!!");
-                        }
-
-                        System.out.println("      [Цель: " + context.getTarget().getRemainingModels() +
-                                " моделей, " + context.getTarget().getRemainingWounds() + " Wounds]");
-                    }
-
-                } else {
-                    System.out.println("-> Не пробил (Бросок: " + context.getWoundRoll() + ")");
-                }
+                processHit(context);
 
                 if (context.getExtraHits() > 0) {
                     for (int j = 0; j < context.getExtraHits(); j++) {
-                        AttackContext newContext = new AttackContext(attacker, target, weapon, phase);
+                        if (!target.isAlive()) {
+                            System.out.println("   [Цель уничтожена. Остальные атаки отменены]");
+                            break;
+                        }
 
                         System.out.print("Дополнительное попадание (Sustained Hits)");
 
-                        boolean isNewWounded = resolveWoundRoll(newContext);
+                        AttackContext newContext = new AttackContext(attacker, target, weapon, phase);
 
-                        if (isNewWounded) {
-                            if (newContext.getAutoWound()) {
-                                System.out.print("Авто‑ранение (Lethal Hits)");
-                            } else {
-                                System.out.print("-> Ранение (Бросок: " + newContext.getWoundRoll() +
-                                        " -> Итого: " + newContext.getFinalWoundRoll() + ") ");
-                            }
-
-                            boolean isDevastating = newContext.isCriticalWound() &&
-                                    newContext.getWeapon().getWeaponKeywords().contains(Keyword.DEVASTATING_WOUNDS);
-
-                            int lostModels = 0;
-                            boolean damageWasDealt = false;
-
-                            if (isDevastating) {
-                                System.out.println("-> DEVASTATING WOUNDS! (Спасброски игнорируются)");
-                                newContext.setIgnoreSave(true);
-                            }
-
-                            boolean isSaved = resolveSaveRoll(newContext);
-
-                            if (isSaved) {
-                                System.out.println("-> ОТБИТО (Бросок: " + newContext.getSaveRoll() +
-                                        " -> Итого: " + newContext.getFinalSaveRoll() + ")");
-                            } else {
-                                System.out.println("-> Провал сейва (Бросок: " + newContext.getSaveRoll() +
-                                        " -> Итого: " + newContext.getFinalSaveRoll() + ")");
-                                lostModels = resolveDamage(newContext);
-                                damageWasDealt = true;
-                            }
-
-                            if (damageWasDealt) {
-                                if (lostModels > 0) {
-                                    System.out.println("      !!! МОДЕЛЬ УНИЧТОЖЕНА !!!");
-                                }
-
-                                System.out.println("      [Цель: " + newContext.getTarget().getRemainingModels() +
-                                        " моделей, " + newContext.getTarget().getRemainingWounds() + " Wounds]");
-                            }
-
-                        } else {
-                            System.out.println("-> Не пробил (Бросок: " + newContext.getWoundRoll() + ")");
-                        }
+                        processHit(newContext);
                     }
                 }
 
@@ -165,7 +86,7 @@ public class CombatEngine {
     }
 
     private boolean resolveHitRoll(AttackContext context) {
-        int diceRoll = DiceRoller.rollD6();
+        int diceRoll = DiceRoller.roll(1, 6);
 
         context.setHitRoll(diceRoll);
 
@@ -196,7 +117,7 @@ public class CombatEngine {
         } else {
             int strength = context.getWeapon().getStrength();
             int toughness = context.getTarget().getDatasheet().getBaseToughness();
-            int diceRoll = DiceRoller.rollD6();
+            int diceRoll = DiceRoller.roll(1, 6);
             int targetNumber = 0;
 
             if (strength >= toughness * 2){
@@ -242,7 +163,7 @@ public class CombatEngine {
 
         int save = context.getTarget().getDatasheet().getBaseSave() - context.getWeapon().getAp();
         int bestSave = Math.min(save, context.getTarget().getDatasheet().getInvulnerableSaveValue());
-        int diceRoll = DiceRoller.rollD6();
+        int diceRoll = DiceRoller.roll(1, 6);
 
         context.setSaveRoll(diceRoll);
 
@@ -279,5 +200,54 @@ public class CombatEngine {
         int lostModels = context.getTarget().receiveDamage(damage);
 
         return lostModels;
+    }
+
+    private void processHit(AttackContext context) {
+        boolean isWounded = resolveWoundRoll(context);
+
+        if (isWounded) {
+
+            if (context.getAutoWound()) {
+                System.out.print("Авто‑ранение (Lethal Hits)");
+            } else {
+                System.out.print("-> Ранение (Бросок: " + context.getWoundRoll() +
+                        " -> Итого: " + context.getFinalWoundRoll() + ") ");
+            }
+
+            boolean isDevastating = context.isCriticalWound() &&
+                    context.getWeapon().getWeaponKeywords().contains(Keyword.DEVASTATING_WOUNDS);
+
+            int lostModels = 0;
+            boolean damageWasDealt = false;
+
+            if (isDevastating) {
+                System.out.println("-> DEVASTATING WOUNDS! (Спасброски игнорируются)");
+                context.setIgnoreSave(true);
+            }
+
+            boolean isSaved = resolveSaveRoll(context);
+
+            if (isSaved) {
+                System.out.println("-> ОТБИТО (Бросок: " + context.getSaveRoll() +
+                        " -> Итого: " + context.getFinalSaveRoll() + ")");
+            } else {
+                System.out.println("-> Провал сейва (Бросок: " + context.getSaveRoll() +
+                        " -> Итого: " + context.getFinalSaveRoll() + ")");
+                lostModels = resolveDamage(context);
+                damageWasDealt = true;
+            }
+
+            if (damageWasDealt) {
+                if (lostModels > 0) {
+                    System.out.println("      !!! МОДЕЛЬ УНИЧТОЖЕНА !!!");
+                }
+
+                System.out.println("      [Цель: " + context.getTarget().getRemainingModels() +
+                        " моделей, " + context.getTarget().getRemainingWounds() + " Wounds]");
+            }
+
+        } else {
+            System.out.println("-> Не пробил (Бросок: " + context.getWoundRoll() + ")");
+        }
     }
 }

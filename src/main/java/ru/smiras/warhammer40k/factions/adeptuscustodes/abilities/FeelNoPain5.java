@@ -44,7 +44,7 @@ public class FeelNoPain5 implements Ability {
 
     @Override
     public void applyAfterSaveRoll(UnitInstance unit, AttackContext context) {
-        int roll = DiceRoller.rollD6();
+        int roll = DiceRoller.roll(1, 6);
         if (roll >= 5) {
             context.cancelDamage();
         }

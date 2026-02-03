@@ -92,8 +92,8 @@ public class TurnManager {
         System.out.println("\n=== ОПРЕДЕЛЕНИЕ ПЕРВОГО ХОДА (Roll-off) ===");
 
         while (true) {
-            int roll1 = DiceRoller.rollD6();
-            int roll2 = DiceRoller.rollD6();
+            int roll1 = DiceRoller.roll(1, 6);
+            int roll2 = DiceRoller.roll(1,6);
 
             System.out.print("Игрок 1 бросает: " + roll1 + " | Игрок 2 бросает: " + roll2);
 
